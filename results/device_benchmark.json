@@ -1,0 +1,27 @@
+{
+ "torch_threads": 4,
+ "cpu/fno_pad0": {
+  "sec_per_epoch": 33.77,
+  "params": 152516
+ },
+ "cpu/fno_pad0.25": {
+  "sec_per_epoch": 30.5,
+  "params": 152516
+ },
+ "cpu/cnn": {
+  "sec_per_epoch": 58.75,
+  "params": 260356
+ },
+ "cuda/fno_pad0": {
+  "sec_per_epoch": 7.51,
+  "params": 152516
+ },
+ "cuda/fno_pad0.25": {
+  "sec_per_epoch": 7.4,
+  "params": 152516
+ },
+ "cuda/cnn": {
+  "sec_per_epoch": 5.72,
+  "params": 260356
+ }
+}

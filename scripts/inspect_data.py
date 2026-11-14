@@ -49,7 +49,7 @@ with h5py.File(path, "r") as f:
         u0 = d[0, :, 0]
         ic_std.append(float(u0.std()))
         ic_mean.append(float(u0.mean()))
-        arr = d[::50, :, 0]
+        arr = d[::10, :, 0]
         nonfinite += int((~np.isfinite(arr)).sum())
         umin.append(float(np.nanmin(arr)))
         umax.append(float(np.nanmax(arr)))
@@ -63,7 +63,7 @@ with h5py.File(path, "r") as f:
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
     for j, i in enumerate(idx[:4]):
         u = f[keys[i]]["data"][:, :, 0]
-        for tk, ls in zip([0, 50, 250, 500], ["-", "--", "-.", ":"]):
+        for tk, ls in zip([0, len(t)//10, len(t)//2, len(t)-1], ["-", "--", "-.", ":"]):
             axes[0].plot(x, u[tk], ls, color=f"C{j}", lw=1, label=f"{keys[i]} t={t[tk]:.0f}" if j == 0 else None)
         axes[2].plot(t, u[:, -1], color=f"C{j}", label=keys[i])
     u = f[keys[idx[0]]]["data"][:, :, 0]

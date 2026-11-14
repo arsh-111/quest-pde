@@ -3,7 +3,7 @@
 The split is by sample key index, fixed BEFORE any shuffling:
   train = keys[0:3200], val = keys[3200:3600], test = keys[3600:4000]
   test_full = keys[3600:3700] at the full 1024 spatial resolution (resolution transfer)
-Spatial stride 4 (1024 -> 256 cells), temporal stride 5 (501 -> 101 times, dt = 5 s).
+Spatial stride 4 (1024 -> 256 points); the file already holds 101 times (dt = 5 s), so no temporal stride.
 Usage: python -I scripts/build_cache.py data/raw/1D_diff-sorp_NA_NA.h5 data/cache
 """
 import json
@@ -16,7 +16,7 @@ import numpy as np
 
 src, out = Path(sys.argv[1]), Path(sys.argv[2])
 out.mkdir(parents=True, exist_ok=True)
-XS, TS = 4, 5
+XS, TS = 4, 1  # the file already stores 101 times (dt = 5 s); see results/data_inspection.json
 SPLITS = {"train": (0, 3200), "val": (3200, 3600), "test": (3600, 4000)}
 FULL = (3600, 3700)
 
@@ -26,13 +26,13 @@ with h5py.File(src, "r") as f:
     assert len(keys) >= 4000, len(keys)
     x_full = f[keys[0]]["grid/x"][:].astype(np.float64)
     t_full = f[keys[0]]["grid/t"][:].astype(np.float64)
-    assert x_full.size == 1024 and t_full.size == 501, (x_full.size, t_full.size)
+    assert x_full.size == 1024 and t_full.size == 101, (x_full.size, t_full.size)
     meta = {"source": src.name, "x_stride": XS, "t_stride": TS, "splits": {}, "full_res_test": None}
     for name, (a, b) in SPLITS.items():
         arr = np.empty((b - a, 101, 256), dtype=np.float32)
         for j, k in enumerate(keys[a:b]):
             d = f[k]["data"]
-            assert d.shape == (501, 1024, 1), d.shape
+            assert d.shape == (101, 1024, 1), d.shape
             arr[j] = d[::TS, ::XS, 0]
         assert np.isfinite(arr).all(), name
         np.save(out / f"{name}.npy", arr)

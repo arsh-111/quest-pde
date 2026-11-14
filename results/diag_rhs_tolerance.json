@@ -1,0 +1,19 @@
+{
+ "max_rel_rhs_difference_on_data_states": 5.111998530275622e-14,
+ "min_u_in_sample": 0.0005032835179008543,
+ "BDF_rtol1e-08": {
+  "vs_data": 0.01424752604251145,
+  "vs_mine_dt0.1": 1.0142564539623129e-05,
+  "seconds": 0.2
+ },
+ "Radau_rtol1e-10": {
+  "vs_data": 0.014247522284410124,
+  "vs_mine_dt0.1": 1.0142478976647392e-05,
+  "seconds": 1.1
+ },
+ "RK45_rtol1e-06": {
+  "vs_data": 0.014247517042588677,
+  "vs_mine_dt0.1": 1.0197038247513657e-05,
+  "seconds": 73.9
+ }
+}

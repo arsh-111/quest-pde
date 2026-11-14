@@ -1,0 +1,70 @@
+{
+  "file": "1D_diff-sorp_NA_NA.h5",
+  "size_bytes": 4217044280,
+  "n_top_level_keys": 10000,
+  "first_keys": [
+    "0000",
+    "0001",
+    "0002",
+    "0003",
+    "0004"
+  ],
+  "last_keys": [
+    "9997",
+    "9998",
+    "9999"
+  ],
+  "root_attrs": {},
+  "sample_layout": {
+    "data": {
+      "shape": [
+        101,
+        1024,
+        1
+      ],
+      "dtype": "float32",
+      "chunks": null,
+      "compression": null
+    },
+    "grid/t": {
+      "shape": [
+        101
+      ],
+      "dtype": "float32",
+      "chunks": null,
+      "compression": null
+    },
+    "grid/x": {
+      "shape": [
+        1024
+      ],
+      "dtype": "float32",
+      "chunks": null,
+      "compression": null
+    }
+  },
+  "sample_attrs_keys": [
+    "config"
+  ],
+  "sample0_config_yaml": "work_dir: ${hydra:runtime.cwd}\ndata_dir: ${work_dir}/data/\noutput_path: /pfs/work7/workspace/scratch/st_ac131224-pde_test/data//diff-sorp/train_0000.h5\nname: null\nsim:\n  D: 0.0005\n  por: 0.29\n  rho_s: 2880\n  k_f: 0.00035\n  n_f: 0.874\n  sol: 1.0\n  t: 500\n  tdim: 501\n  x_left: 0.0\n  x_right: 1.0\n  xdim: 1024\n  'n': 1\n  seed: 0\ndefault_mode: true\n",
+  "x": {
+    "n": 1024,
+    "first": 0.00048828125,
+    "last": 0.99951171875,
+    "dx": 0.0009765625
+  },
+  "t": {
+    "n": 101,
+    "first": 0.0,
+    "last": 500.0,
+    "dt": 5.0
+  },
+  "ic_stats_200_samples": {
+    "max_spatial_std_of_u0": 2.9802322387695312e-08,
+    "mean_u0_min": 0.0012039176654070616,
+    "mean_u0_max": 0.19986198842525482,
+    "u_min_over_samples": 7.4520730777294375e-06,
+    "u_max_over_samples": 0.9997209310531616,
+    "nonfinite_values_in_checked_slices": 0
+  }
+}
