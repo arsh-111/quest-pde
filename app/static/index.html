@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sorption Surrogate Lab</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"></script>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Sorption Surrogate Lab</h1>
+    <p class="sub">PDEBench 1D diffusion–sorption · FNO surrogate vs. a validated implicit solver</p>
+  </div>
+  <div id="health" class="pill">connecting…</div>
+</header>
+
+<main>
+<aside id="controls">
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-mode="level" role="tab">Level c</button>
+    <button class="tab" data-mode="stress" role="tab">IC stress lab</button>
+    <button class="tab" data-mode="physics" role="tab">Physics-shift lab</button>
+  </nav>
+
+  <section class="mode" id="mode-level">
+    <label>Initial level c <output id="c-out"></output></label>
+    <input type="range" id="c" min="0" max="0.4" step="0.001" value="0.1">
+    <div class="range-note" id="c-note">Training data: spatially constant levels c ∈ (0, 0.2).</div>
+  </section>
+
+  <section class="mode hidden" id="mode-stress">
+    <p class="warn-box">Every IC on this tab is <b>out of distribution</b>: the surrogate was trained only on
+      spatially constant levels. Use it to see how the surrogate degrades.</p>
+    <label>IC type
+      <select id="ic-kind">
+        <option value="pulse">Gaussian pulse</option>
+        <option value="smooth">smooth random field</option>
+        <option value="noise">uniform noise</option>
+        <option value="step">step</option>
+        <option value="custom">CSV upload</option>
+      </select>
+    </label>
+    <div id="ic-params"></div>
+    <div id="csv-box" class="hidden">
+      <input type="file" id="csv" accept=".csv,.txt">
+      <div class="range-note">One column of values (or comma-separated), resampled to the 1024-cell grid.</div>
+    </div>
+    <div id="ood-table"></div>
+  </section>
+
+  <section class="mode hidden" id="mode-physics">
+    <p class="warn-box">The surrogate's physics is <b>fixed</b> at the training values. These sliders drive only the
+      numerical solver, so the gap you see is the surrogate's error from no longer matching the physics.</p>
+    <label>Initial level c <output id="pc-out"></output></label>
+    <input type="range" id="pc" min="0" max="0.2" step="0.001" value="0.1">
+    <div id="phys-sliders"></div>
+    <button id="reset-phys" class="secondary">Reset to training values</button>
+    <label>Sweep one parameter
+      <select id="sweep-param"></select>
+    </label>
+    <button id="run-sweep" class="secondary">Run sweep</button>
+  </section>
+
+  <hr>
+  <label>Surrogate
+    <select id="model">
+      <option value="ensemble">FNO ensemble (5 seeds)</option>
+      <option value="fno">single FNO</option>
+      <option value="cnn">CNN baseline</option>
+    </select>
+  </label>
+  <label>Display resolution
+    <select id="nx"><option value="256">256 points (training grid)</option><option value="1024">1024 points (zero-shot)</option></select>
+  </label>
+  <label>Time horizon <output id="th-out"></output></label>
+  <input type="range" id="th" min="10" max="500" step="5" value="500">
+  <label>Probe position x <output id="xq-out"></output></label>
+  <input type="range" id="xq" min="0.02" max="0.9" step="0.01" value="0.25">
+</aside>
+
+<section id="results">
+  <div id="banner" class="banner hidden"></div>
+  <div id="cards" class="cards"></div>
+
+  <div class="panel">
+    <h2>Space–time view</h2>
+    <div class="heatmaps">
+      <div id="hm-sur" class="plot"></div><div id="hm-sol" class="plot"></div><div id="hm-err" class="plot"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Profile at time <output id="ts-out"></output></h2>
+    <input type="range" id="ts" min="0" max="100" step="1" value="20" aria-label="time index">
+    <div id="profile" class="plot tall"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Observables over time</h2>
+    <p class="explain" id="obs-explain"></p>
+    <div class="obs">
+      <div id="obs-conc" class="plot"></div><div id="obs-front" class="plot"></div><div id="obs-uptake" class="plot"></div>
+    </div>
+  </div>
+
+  <div class="panel hidden" id="sweep-panel">
+    <h2>Physics shift: surrogate error vs one parameter</h2>
+    <div id="sweep" class="plot tall"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Why three curves?</h2>
+    <div id="explainer" class="explain"></div>
+  </div>
+</section>
+</main>
+<footer id="footer"></footer>
+<script src="/static/app.js"></script>
+</body>
+</html>
