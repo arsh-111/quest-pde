@@ -1,6 +1,5 @@
 {
  "matched": [
-  "2",
   "3e-8",
   "1.4%",
   "2.3e-8",
@@ -12,7 +11,6 @@
   "4",
   "8.8",
   "87%",
-  "7",
   "9",
   "0.01%",
   "0.009%",
@@ -28,8 +26,7 @@
   "18",
   "25",
   "16",
-  "514",
-  "27"
+  "514"
  ],
  "whitelisted": [
   {
@@ -79,6 +76,10 @@
   {
    "token": "1",
    "source": "BC value / dt"
+  },
+  {
+   "token": "2",
+   "source": "Azure free grant: 2 million requests"
   },
   {
    "token": "0",
@@ -157,6 +158,10 @@
    "source": "1.0 -> 1.1"
   },
   {
+   "token": "7",
+   "source": "short commit hash length in the image tag"
+  },
+  {
    "token": "404",
    "source": "HTTP status of the broken CDN URL"
   },
@@ -165,16 +170,16 @@
    "source": "checkpoints"
   },
   {
-   "token": "402",
-   "source": "HTTP status (results/deploy_attempt.json)"
+   "token": "180,000",
+   "source": "Azure Container Apps free grant, vCPU-s (Microsoft billing docs)"
+  },
+  {
+   "token": "360,000",
+   "source": "Azure Container Apps free grant, GiB-s (Microsoft billing docs)"
   },
   {
    "token": "512",
    "source": "typical free-tier MB"
-  },
-  {
-   "token": "7860",
-   "source": "Space port"
   }
  ],
  "unmatched": [],

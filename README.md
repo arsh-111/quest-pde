@@ -5,7 +5,10 @@ surrogate (a 5-seed FNO ensemble) for PDEBench's 1D diffusion–sorption dataset
 independently written, validated implicit solver. An interpolation baseline, an out-of-distribution stress lab and a
 physics-shift lab are included.
 
-- **Deployment status: not deployed.** Hugging Face refused to create the Docker Space: HTTP 402, because free CPU Docker Spaces now require a PRO subscription (`results/deploy_attempt.json`). The user chose not to deploy elsewhere. The Dockerfile and deploy scripts are included and were smoke-tested from the staged build folder; see [Deployment](#deployment).
+- **Deployment status: not yet live.**
+  - Hugging Face refused the free Docker Space (HTTP 402: it now needs PRO; `results/deploy_attempt.json`).
+  - The image is built, smoke-tested and published to `ghcr.io/arsh-111/quest-pde` by GitHub Actions.
+  - [Deployment](#deployment) gives the Azure Container Apps commands (free monthly grant, scale to zero); they run under your Azure account.
 - **Numbers:** every number in the tables below is generated from `results/*.json` by `scripts/make_readme_tables.py`; prose numbers are checked against those files by `scripts/audit_readme.py`. Decisions and their evidence are in [`DECISIONS.md`](DECISIONS.md), and the full metrics in [`results/RESULTS.md`](results/RESULTS.md).
 
 ## Run locally
@@ -264,10 +267,81 @@ Gzip trade-off on /api/compare (`results/gzip_tradeoff.json`): 792.9 KB → 245.
 
 ## Deployment
 
+### Container image (GitHub Actions → GHCR)
+
+`.github/workflows/docker-ghcr.yml` runs on every push to `main` that changes serving files, and on manual dispatch. It:
+
+1. stages the minimal build context (`scripts/stage_space.py`: code, the 6 served checkpoints, assets, `deploy/Dockerfile`);
+2. builds a `linux/amd64` image with the CPU-only PyTorch wheel;
+3. starts it on the runner with a 1 GB memory limit and runs a smoke test with real requests to `/api/health`, `/api/predict`, `/api/compare`, `/api/physics_sweep` and `/`;
+4. only if that passes, pushes `ghcr.io/arsh-111/quest-pde:latest` and an immutable `:sha-<commit>` tag.
+
+GHCR may create the package as **private** the first time. Make it public once under GitHub → your profile → Packages →
+`quest-pde` → Package settings → Change visibility → Public. Otherwise Azure cannot pull it anonymously.
+
+### Deploy to Azure Container Apps (free monthly grant)
+
+The Consumption plan includes a monthly free grant per subscription: 180,000 vCPU-seconds, 360,000 GiB-seconds and
+2 million requests ([Microsoft billing docs](https://learn.microsoft.com/azure/container-apps/billing)). The settings
+below keep this app inside the grant:
+
+- **0.5 vCPU / 1 GiB.** The server used 514 MB under load (`results/deploy_attempt.json`).
+- **Scale to zero** (minimum 0 replicas, maximum 1). An always-on replica would exceed the grant.
+- **No Log Analytics workspace** (`--logs-destination none`), which could otherwise cost money.
+- **Image pulled from GHCR**, not Azure Container Registry, which the grant does not cover.
+- **`TORCH_NUM_THREADS=1`**, because a 0.5 vCPU container may still report the host's cores.
+
+Run these yourself in a terminal with the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli), or in
+Azure Cloud Shell, after `az login`. Creating the Azure account, choosing a subscription and anything to do with billing
+are yours to do.
+
+```bash
+az extension add --name containerapp --upgrade
+az provider register --namespace Microsoft.App --wait
+
+RG=quest-pde-rg ; ENV=quest-pde-env ; APP=quest-pde ; LOC=centralindia   # any region with Container Apps
+
+az group create --name $RG --location $LOC
+az containerapp env create --name $ENV --resource-group $RG --location $LOC --logs-destination none
+
+az containerapp create \
+  --name $APP --resource-group $RG --environment $ENV \
+  --image ghcr.io/arsh-111/quest-pde:latest \
+  --ingress external --target-port 7860 \
+  --cpu 0.5 --memory 1.0Gi \
+  --min-replicas 0 --max-replicas 1 \
+  --env-vars TORCH_NUM_THREADS=1 \
+  --query properties.configuration.ingress.fqdn --output tsv     # prints the app's host name
+```
+
+Then open `https://<printed host name>/`. Expect the first request after idle to take several seconds: the replica
+starts, imports PyTorch and loads the models.
+
+**Verify the live app** with the same checks used locally:
+
+```bash
+python scripts/ui_check.py https://<host name>
+python scripts/latency.py https://<host name> results/latency_azure.json
+```
+
+**Roll out a new image** (pin the immutable tag that the workflow prints):
+
+```bash
+az containerapp update --name $APP --resource-group $RG --image ghcr.io/arsh-111/quest-pde:sha-<commit>
+```
+
+**Guard against costs.** In the Azure portal → Cost Management → Budgets, create a monthly budget (for example 1 USD)
+with an email alert. **Remove everything** when you no longer need it:
+
+```bash
+az group delete --name $RG --yes
+```
+
+### Earlier attempt: Hugging Face Spaces
+
 - **Attempt:** Hugging Face Space `HarshalShirke/sorption-surrogate-lab`, Docker SDK, cpu-basic, public. Creation was refused with HTTP 402 ("hosting Gradio and Docker Spaces on free cpu-basic requires a PRO subscription"). Nothing was created or uploaded (`results/deploy_attempt.json`).
 - **Memory:** the server used 514 MB RSS under load, which rules out 512 MB free container tiers without changes.
-- **Decision:** the user chose not to deploy.
-- **Kept for later:** `deploy/Dockerfile` (CPU-only torch wheel, port 7860), `scripts/stage_space.py` (minimal build context, about 27 MB) and `scripts/deploy_space.py`. The deploy script uploads through the Hub API, so local git history is not pushed, and it prints the build log on failure.
+- `scripts/deploy_space.py` remains for a PRO account. It uploads through the Hub API, so local git history is not pushed.
 
 ## Reproduce
 
@@ -303,3 +377,4 @@ python scripts/latency.py http://127.0.0.1:8765 ; python scripts/gzip_tradeoff.p
 | `figures/` | evaluation plots and UI screenshots |
 | `checkpoints/` | 17 small `.pt` files: 6 are served, the rest are for the padding and data-efficiency comparisons |
 | `deploy/` | Dockerfile, Space card, slim requirements |
+| `.github/workflows/` | `docker-ghcr.yml`: build, smoke-test and publish the serving image to GHCR |

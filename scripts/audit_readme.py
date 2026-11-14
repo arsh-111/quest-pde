@@ -29,7 +29,7 @@ WHITELIST = {
     "400": "test samples", "20": "validation samples", "38": "UI checks (results/ui_check.json total)", "390": "phone width px",
     "402": "HTTP status (results/deploy_attempt.json)", "404": "HTTP status of the broken CDN URL", "512": "typical free-tier MB", "7860": "Space port", "8765": "local port",
     "1D": "dimension", "2.35.2": "Plotly version", "256": "points / table levels", "2.6.0": "torch version",
-    "6000": "sweep optimiser steps", "6": "OOD per family (min)", "10": "latency calls", "x": "",
+    "6000": "sweep optimiser steps", "180,000": "Azure Container Apps free grant, vCPU-s (Microsoft billing docs)", "360,000": "Azure Container Apps free grant, GiB-s (Microsoft billing docs)", "2": "Azure free grant: 2 million requests", "7": "short commit hash length in the image tag", "6": "OOD per family (min)", "10": "latency calls", "x": "",
 }
 nums = []
 

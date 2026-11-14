@@ -30,7 +30,9 @@ PARAM_RANGES = {      # physics-shift lab slider ranges (factor ~0.25x .. 4x aro
     "k_f": (5e-5, 1.4e-3), "n_f": (0.5, 1.0), "sol": (0.5, 1.0),
 }
 
-torch.set_num_threads(max(1, min(4, os.cpu_count() or 1)))  # 4 on the dev laptop, 2 on a free Space
+# TORCH_NUM_THREADS overrides: a container with a CPU limit (e.g. 0.5 vCPU on Azure Container Apps) may still report
+# the host's cores via os.cpu_count(), and over-subscribed threads slow PyTorch down. Default: up to 4 (dev laptop).
+torch.set_num_threads(int(os.environ.get("TORCH_NUM_THREADS") or max(1, min(4, os.cpu_count() or 1))))
 
 
 def x_grid(nx: int) -> np.ndarray:
