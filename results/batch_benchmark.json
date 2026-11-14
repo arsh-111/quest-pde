@@ -1,0 +1,80 @@
+{
+ "statistic": "median of individually timed repetitions",
+ "background_cpu_percent_after": 11.4,
+ "threads": 4,
+ "cpu": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+ "torch": "2.6.0+cu124",
+ "rows": [
+  {
+   "method": "single FNO",
+   "batch": 1,
+   "ms_per_sample": 7.792799999151612
+  },
+  {
+   "method": "5-FNO ensemble",
+   "batch": 1,
+   "ms_per_sample": 54.83259999891743
+  },
+  {
+   "method": "CNN",
+   "batch": 1,
+   "ms_per_sample": 8.34959999883722
+  },
+  {
+   "method": "interpolation in c",
+   "batch": 1,
+   "ms_per_sample": 0.2636499993968755
+  },
+  {
+   "method": "single FNO",
+   "batch": 10,
+   "ms_per_sample": 2.325849999942875
+  },
+  {
+   "method": "5-FNO ensemble",
+   "batch": 10,
+   "ms_per_sample": 10.566664999896602
+  },
+  {
+   "method": "CNN",
+   "batch": 10,
+   "ms_per_sample": 3.3677800000077696
+  },
+  {
+   "method": "interpolation in c",
+   "batch": 10,
+   "ms_per_sample": 0.31938499996613245
+  },
+  {
+   "method": "single FNO",
+   "batch": 100,
+   "ms_per_sample": 0.8759659999850555
+  },
+  {
+   "method": "5-FNO ensemble",
+   "batch": 100,
+   "ms_per_sample": 3.940472999966005
+  },
+  {
+   "method": "CNN",
+   "batch": 100,
+   "ms_per_sample": 1.8115850000322098
+  },
+  {
+   "method": "interpolation in c",
+   "batch": 100,
+   "ms_per_sample": 0.6079820000013569
+  },
+  {
+   "method": "implicit solver (1024 cells, dt=1.0)",
+   "batch": 1,
+   "ms_per_sample": 914.1499999968801
+  },
+  {
+   "method": "implicit solver (1024 cells, dt=0.5)",
+   "batch": 1,
+   "ms_per_sample": 1245.1983000028122
+  }
+ ],
+ "measured": "2026-11-14 12:29:19"
+}

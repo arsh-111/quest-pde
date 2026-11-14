@@ -1,0 +1,15 @@
+{
+ "plain": {
+  "http_ms_median": 477.4,
+  "outside_compute_ms_median": 153.2,
+  "transferred_kb": 792.9,
+  "n": 16
+ },
+ "gzip": {
+  "http_ms_median": 573.9,
+  "outside_compute_ms_median": 206.7,
+  "transferred_kb": 245.9,
+  "n": 16
+ },
+ "note": "localhost; outside_compute = HTTP time minus server-side compute (JSON encoding, gzip, transfer)"
+}

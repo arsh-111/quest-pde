@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from functools import lru_cache
 from pathlib import Path
@@ -29,7 +30,7 @@ PARAM_RANGES = {      # physics-shift lab slider ranges (factor ~0.25x .. 4x aro
     "k_f": (5e-5, 1.4e-3), "n_f": (0.5, 1.0), "sol": (0.5, 1.0),
 }
 
-torch.set_num_threads(4)
+torch.set_num_threads(max(1, min(4, os.cpu_count() or 1)))  # 4 on the dev laptop, 2 on a free Space
 
 
 def x_grid(nx: int) -> np.ndarray:

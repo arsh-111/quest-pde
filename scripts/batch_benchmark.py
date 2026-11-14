@@ -24,16 +24,19 @@ s = Service()
 x = x_grid(256)
 t = np.linspace(0, 500, 101)
 rng = np.random.default_rng(0)
-REPS = {1: 30, 10: 10, 100: 3}
+REPS = {1: 50, 10: 20, 100: 7}
 rows = []
 
 
 def bench(fn, reps):
+    """Median of individually timed repetitions (robust to background-load spikes)."""
     fn()
-    t0 = time.perf_counter()
+    ts = []
     for _ in range(reps):
+        t0 = time.perf_counter()
         fn()
-    return (time.perf_counter() - t0) / reps
+        ts.append(time.perf_counter() - t0)
+    return float(np.median(ts))
 
 
 for bs, reps in REPS.items():
@@ -47,9 +50,11 @@ for bs, reps in REPS.items():
                  "ms_per_sample": bench(lambda: [s._table_interp(float(c)) for c in lv], reps) * 1e3 / bs})
     print(bs, [f"{r['method']}={r['ms_per_sample']:.3f}" for r in rows if r["batch"] == bs], flush=True)
 for dt in (1.0, 0.5):
-    sec = bench(lambda: solve(np.full(1024, 0.1), t, dt=dt), 3)
+    sec = bench(lambda: solve(np.full(1024, 0.1), t, dt=dt), 7)
     rows.append({"method": f"implicit solver (1024 cells, dt={dt})", "batch": 1, "ms_per_sample": sec * 1e3})
     print("solver", dt, f"{sec * 1e3:.1f} ms", flush=True)
-out = {"threads": torch.get_num_threads(), "cpu": platform.processor(), "torch": torch.__version__, "rows": rows,
+import psutil  # noqa: E402
+out = {"statistic": "median of individually timed repetitions",
+       "background_cpu_percent_after": psutil.cpu_percent(interval=1.0), "threads": torch.get_num_threads(), "cpu": platform.processor(), "torch": torch.__version__, "rows": rows,
        "measured": time.strftime("%Y-%m-%d %H:%M:%S")}
 (ROOT / "results" / "batch_benchmark.json").write_text(json.dumps(out, indent=1))

@@ -41,7 +41,7 @@ cats_order = ["const_in", "const_high", "smooth", "noise", "pulse", "step"]
 ood_table = [{"category": k, **{m: ev["ood"][ens][k][m] for m in ("mean", "worst", "n")}}
              for k in cats_order if k in ev["ood"][ens]]
 
-pct = lambda v: f"{100 * v:.2f}%"  # noqa: E731
+pct = lambda v: f"{100 * v:.3f}%" if v < 0.01 else f"{100 * v:.2f}%"  # noqa: E731  (same rule as app.js)
 summary = {
     "ensemble": pc["chosen"],
     "test": {"ensemble_vs_data": T[ens]["rel_l2_vs_data"], "ensemble_vs_solver": T[ens]["rel_l2_vs_solver"],
@@ -100,14 +100,20 @@ summary["model_guide"] = {
 }
 g = summary["model_guide"]
 hi = next(r for r in g["ood_rows"] if r["family"] == "const_high")
+fno_better = [r for r in g["ood_rows"] if r["family"] != "const_in" and r["ensemble"] < r["interp"]]
+itp_better = [r for r in g["ood_rows"] if r["family"] != "const_in" and r["ensemble"] >= r["interp"]]
+fam = lambda rows: ", ".join(f"{r['family']} ({pct(r['ensemble'])} vs {pct(r['interp'])})" for r in rows)  # noqa: E731
 summary["model_guide_html"] = (
     f"<b>In range (flat IC, 0 &lt; c &lt; 0.2): interpolation wins.</b> Interpolating stored trajectories in c is "
-    f"{pct(g['in_range']['interp_full_vs_data'])} from held-out data with all {g["in_range"]["interp_full_levels"]:,} training trajectories "
-    f"({pct(g['in_range']['interp_app_table_vs_data'])} with the {K}-level table this app serves); the FNO ensemble is "
-    f"{pct(g['in_range']['ensemble_vs_data'])}. "
-    f"<b>Out of range or non-flat ICs: the FNO helps.</b> For c &gt; 0.2 the ensemble is {pct(hi['ensemble'])} from the "
-    f"accurate solver vs {pct(hi['interp'])} for interpolation, which can only clamp to the edge of its table. "
-    "For non-flat ICs interpolation sees only the mean level (see the table).")
+    f"{pct(g['in_range']['interp_full_vs_data'])} from held-out data with all {g['in_range']['interp_full_levels']:,} "
+    f"training trajectories ({pct(g['in_range']['interp_app_table_vs_data'])} with the {K}-level table this app serves); "
+    f"the FNO ensemble is {pct(g['in_range']['ensemble_vs_data'])}. "
+    f"<b>Out of distribution, the FNO ensemble is better for:</b> {fam(fno_better) or 'none'} "
+    f"(ensemble vs interpolation, against the accurate solver). "
+    + (f"<b>Interpolation from the mean level is still better for:</b> {fam(itp_better)}, because those ICs smooth out "
+       "within the first output steps. " if itp_better else "")
+    + "Interpolation cannot extrapolate: above its table it clamps to the edge. The OOD set has only 6–8 samples per "
+    "family, so small differences (e.g. smooth, pulse) are within noise.")
 summary["two_errors_html"] = (
     "Two errors, always shown together: <b>vs dataset</b> is how well the model reproduces PDEBench's stored "
     "trajectories (what it was trained on); <b>vs accurate solver</b> is the error against the equations solved "
@@ -121,10 +127,12 @@ pd = R / "padding_3seeds.json"
 if pd.exists():
     P = json.loads(pd.read_text())["configs"]
     summary["padding"] = {k: v["mean_std"] for k, v in P.items()}
+    q = lambda v: f"{100 * v:.3f}%"  # noqa: E731
+    a0, a1 = P["fno_pad0"]["mean_std"], P["fno_pad25"]["mean_std"]
     summary["padding_note"] = (
-        f"Padding (3 seeds each): test rel L2 pad0 {pct(P['fno_pad0']['mean_std']['test_rel_l2']['mean'])} "
-        f"± {pct(P['fno_pad0']['mean_std']['test_rel_l2']['std'])}, pad 0.25 "
-        f"{pct(P['fno_pad25']['mean_std']['test_rel_l2']['mean'])} ± {pct(P['fno_pad25']['mean_std']['test_rel_l2']['std'])}.")
+        f"Padding comparison, 3 seeds each (mean ± std): test rel L2 pad0 {q(a0['test_rel_l2']['mean'])} ± "
+        f"{q(a0['test_rel_l2']['std'])} vs pad 0.25 {q(a1['test_rel_l2']['mean'])} ± {q(a1['test_rel_l2']['std'])}; "
+        f"right-boundary MAE {a0['right_mae']['mean']:.1e} vs {a1['right_mae']['mean']:.1e} (padding helps only there).")
 else:
     summary["padding_note"] = "Padding comparison: single seed (pad0 vs pad 0.25)."
 summary["trust"]["card_note"] = (f"informational only; Spearman with true error: {sp_t['rho']:.2f} in range, "

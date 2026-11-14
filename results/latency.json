@@ -1,66 +1,83 @@
 {
  "predict_ensemble_256": {
-  "http_ms_median": 132.3,
-  "http_ms_max": 182.7,
-  "response_kb": 440.1,
+  "http_ms_median": 286.0,
+  "http_ms_max": 436.0,
+  "response_kb_uncompressed": 380.8,
+  "transferred_kb_gzip": 92.4,
   "server_side_median": {
-   "timing_ms": 15.6
+   "timing_ms": 39.9
   },
   "n": 10
  },
  "predict_fno_256": {
-  "http_ms_median": 65.7,
-  "http_ms_max": 90.1,
-  "response_kb": 230.3,
+  "http_ms_median": 136.2,
+  "http_ms_max": 214.5,
+  "response_kb_uncompressed": 204.9,
+  "transferred_kb_gzip": 71.8,
   "server_side_median": {
-   "timing_ms": 4.9
+   "timing_ms": 6.6
   },
   "n": 10
  },
  "predict_fno_1024": {
-  "http_ms_median": 214.6,
-  "http_ms_max": 248.6,
-  "response_kb": 906.6,
+  "http_ms_median": 406.0,
+  "http_ms_max": 468.6,
+  "response_kb_uncompressed": 805.6,
+  "transferred_kb_gzip": 263.9,
   "server_side_median": {
-   "timing_ms": 6.4
+   "timing_ms": 8.1
   },
   "n": 10
  },
  "solve_256": {
-  "http_ms_median": 294.1,
-  "http_ms_max": 357.1,
-  "response_kb": 227.5,
+  "http_ms_median": 521.1,
+  "http_ms_max": 571.7,
+  "response_kb_uncompressed": 202.3,
+  "transferred_kb_gzip": 70.3,
   "server_side_median": {
-   "timing_ms": 244.1
+   "timing_ms": 433.6
   },
   "n": 10
  },
  "compare_ensemble_256": {
-  "http_ms_median": 462.7,
-  "http_ms_max": 541.4,
-  "response_kb": 896.4,
+  "http_ms_median": 864.5,
+  "http_ms_max": 955.9,
+  "response_kb_uncompressed": 792.9,
+  "transferred_kb_gzip": 245.9,
   "server_side_median": {
-   "total_ms": 342.9,
-   "surrogate_ms": 17.2,
-   "solver_ms": 316.9
+   "total_ms": 515.2,
+   "surrogate_ms": 21.6,
+   "solver_ms": 479.6
   },
   "n": 10
  },
  "compare_ensemble_1024": {
-  "http_ms_median": 809.2,
-  "http_ms_max": 957.2,
-  "response_kb": 2677.7,
+  "http_ms_median": 984.4,
+  "http_ms_max": 1035.4,
+  "response_kb_uncompressed": 2372.5,
+  "transferred_kb_gzip": 627.0,
   "server_side_median": {
-   "total_ms": 360.6,
-   "surrogate_ms": 22.6,
-   "solver_ms": 323.8
+   "total_ms": 411.1,
+   "surrogate_ms": 28.2,
+   "solver_ms": 360.2
+  },
+  "n": 10
+ },
+ "predict_interp_256": {
+  "http_ms_median": 78.1,
+  "http_ms_max": 85.4,
+  "response_kb_uncompressed": 202.1,
+  "transferred_kb_gzip": 70.2,
+  "server_side_median": {
+   "timing_ms": 0.3
   },
   "n": 10
  },
  "physics_sweep_7": {
-  "http_ms_median": 2216.4,
-  "http_ms_max": 2347.3,
-  "response_kb": 0.8,
+  "http_ms_median": 2527.4,
+  "http_ms_max": 2530.4,
+  "response_kb_uncompressed": 0.8,
+  "transferred_kb_gzip": 0.8,
   "server_side_median": {},
   "n": 3
  }

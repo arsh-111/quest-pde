@@ -126,8 +126,8 @@
    "per_sample_s": 0.28835846666637127
   }
  },
- "explainer_html": "<b>Accurate solver</b> (black): the PDEBench equations solved with an implicit BDF2/Newton scheme on the same 1024-cell grid; it agrees with a tight-tolerance reference to 2.4e-04 (relative L2) at the step used here. <b>Dataset-style</b> (orange): interpolation between stored PDEBench trajectories. The generator integrated with SciPy RK45 at default tolerances, which leaves a 1.45% relative-L2 time-integration error that grows with t. <b>Surrogate</b> (blue): trained on the dataset, so it reproduces the dataset (0.12% mean on held-out test samples) and inherits its offset from the accurate solution (1.44%). Shown only for spatially constant ICs at the training physics.",
- "observables_html": "The breakthrough curve at x = 1 is not shown: the outflow boundary u = D\u00b7\u2202u/\u2202x with D = 5e-4 keeps u(1) \u2248 0, so it is flat in every sample. Instead: the concentration at a chosen x, the position of the u = 0.5 front, and the total amount that has entered the column (uptake). The inflow flux at x = 0 is not shown either: it depends on 1 \u2212 u in the first cell, and even the PDEBench data differs from the accurate solver there by 22.54% (the surrogate: 19.63% vs data). Uptake is its time integral and is robust: ensemble vs data 0.11%.",
+ "explainer_html": "<b>Accurate solver</b> (black): the PDEBench equations solved with an implicit BDF2/Newton scheme on the same 1024-cell grid; it agrees with a tight-tolerance reference to 2.4e-04 (relative L2) at the step used here. <b>Dataset-style</b> (orange): interpolation between stored PDEBench trajectories. The generator integrated with SciPy RK45 at default tolerances, which leaves a 1.45% relative-L2 time-integration error that grows with t. <b>Surrogate</b> (blue): trained on the dataset, so it reproduces the dataset (0.124% mean on held-out test samples) and inherits its offset from the accurate solution (1.44%). Shown only for spatially constant ICs at the training physics.",
+ "observables_html": "The breakthrough curve at x = 1 is not shown: the outflow boundary u = D\u00b7\u2202u/\u2202x with D = 5e-4 keeps u(1) \u2248 0, so it is flat in every sample. Instead: the concentration at a chosen x, the position of the u = 0.5 front, and the total amount that has entered the column (uptake). The inflow flux at x = 0 is not shown either: it depends on 1 \u2212 u in the first cell, and even the PDEBench data differs from the accurate solver there by 22.54% (the surrogate: 19.63% vs data). Uptake is its time integral and is robust: ensemble vs data 0.113%.",
  "footer_html": "Ensemble: 5 \u00d7 FNO (fno_pad0), trained on 3,200 PDEBench samples (keys 0000\u20133199); test keys 3600\u20133999. All numbers on this page come from results/*.json produced in this project.",
  "model_guide": {
   "in_range": {
@@ -178,7 +178,7 @@
    }
   ]
  },
- "model_guide_html": "<b>In range (flat IC, 0 &lt; c &lt; 0.2): interpolation wins.</b> Interpolating stored trajectories in c is 0.01% from held-out data with all 3,200 training trajectories (0.05% with the 256-level table this app serves); the FNO ensemble is 0.12%. <b>Out of range or non-flat ICs: the FNO helps.</b> For c &gt; 0.2 the ensemble is 8.62% from the accurate solver vs 37.29% for interpolation, which can only clamp to the edge of its table. For non-flat ICs interpolation sees only the mean level (see the table).",
+ "model_guide_html": "<b>In range (flat IC, 0 &lt; c &lt; 0.2): interpolation wins.</b> Interpolating stored trajectories in c is 0.009% from held-out data with all 3,200 training trajectories (0.051% with the 256-level table this app serves); the FNO ensemble is 0.124%. <b>Out of distribution, the FNO ensemble is better for:</b> const_high (8.62% vs 37.29%), smooth (2.90% vs 3.43%), pulse (6.79% vs 7.45%), step (6.81% vs 9.68%) (ensemble vs interpolation, against the accurate solver). <b>Interpolation from the mean level is still better for:</b> noise (2.15% vs 1.54%), because those ICs smooth out within the first output steps. Interpolation cannot extrapolate: above its table it clamps to the edge. The OOD set has only 6\u20138 samples per family, so small differences (e.g. smooth, pulse) are within noise.",
  "two_errors_html": "Two errors, always shown together: <b>vs dataset</b> is how well the model reproduces PDEBench's stored trajectories (what it was trained on); <b>vs accurate solver</b> is the error against the equations solved accurately. They differ by the dataset's own RK45 tolerance error (~1.44%).",
  "test_two_errors": {
   "interp_u0": {
@@ -198,5 +198,139 @@
    "vs_solver": 0.014405181631445885
   }
  },
- "padding_note": "Padding comparison: single seed (pad0 vs pad 0.25)."
+ "batch_benchmark": {
+  "statistic": "median of individually timed repetitions",
+  "background_cpu_percent_after": 11.4,
+  "threads": 4,
+  "cpu": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+  "torch": "2.6.0+cu124",
+  "rows": [
+   {
+    "method": "single FNO",
+    "batch": 1,
+    "ms_per_sample": 7.792799999151612
+   },
+   {
+    "method": "5-FNO ensemble",
+    "batch": 1,
+    "ms_per_sample": 54.83259999891743
+   },
+   {
+    "method": "CNN",
+    "batch": 1,
+    "ms_per_sample": 8.34959999883722
+   },
+   {
+    "method": "interpolation in c",
+    "batch": 1,
+    "ms_per_sample": 0.2636499993968755
+   },
+   {
+    "method": "single FNO",
+    "batch": 10,
+    "ms_per_sample": 2.325849999942875
+   },
+   {
+    "method": "5-FNO ensemble",
+    "batch": 10,
+    "ms_per_sample": 10.566664999896602
+   },
+   {
+    "method": "CNN",
+    "batch": 10,
+    "ms_per_sample": 3.3677800000077696
+   },
+   {
+    "method": "interpolation in c",
+    "batch": 10,
+    "ms_per_sample": 0.31938499996613245
+   },
+   {
+    "method": "single FNO",
+    "batch": 100,
+    "ms_per_sample": 0.8759659999850555
+   },
+   {
+    "method": "5-FNO ensemble",
+    "batch": 100,
+    "ms_per_sample": 3.940472999966005
+   },
+   {
+    "method": "CNN",
+    "batch": 100,
+    "ms_per_sample": 1.8115850000322098
+   },
+   {
+    "method": "interpolation in c",
+    "batch": 100,
+    "ms_per_sample": 0.6079820000013569
+   },
+   {
+    "method": "implicit solver (1024 cells, dt=1.0)",
+    "batch": 1,
+    "ms_per_sample": 914.1499999968801
+   },
+   {
+    "method": "implicit solver (1024 cells, dt=0.5)",
+    "batch": 1,
+    "ms_per_sample": 1245.1983000028122
+   }
+  ],
+  "measured": "2026-11-14 12:29:19"
+ },
+ "padding": {
+  "fno_pad0": {
+   "val": {
+    "mean": 0.00127351563423872,
+    "std": 2.998144559993086e-05
+   },
+   "test_rel_l2": {
+    "mean": 0.0012919904741769035,
+    "std": 3.47568737670808e-05
+   },
+   "left_mae": {
+    "mean": 0.0017113355764498313,
+    "std": 1.427870488600088e-05
+   },
+   "right_mae": {
+    "mean": 0.00044406834058463573,
+    "std": 3.144284944186968e-05
+   },
+   "interior_mae": {
+    "mean": 0.00022249026127004376,
+    "std": 2.2378758734688994e-05
+   },
+   "ood_mean_rel_l2": {
+    "mean": 0.05211613948146502,
+    "std": 0.0055354267180003315
+   }
+  },
+  "fno_pad25": {
+   "val": {
+    "mean": 0.0013199066743254662,
+    "std": 3.351521944222829e-05
+   },
+   "test_rel_l2": {
+    "mean": 0.001348526100628078,
+    "std": 3.990529092057438e-05
+   },
+   "left_mae": {
+    "mean": 0.0017315231962129474,
+    "std": 6.044971938199496e-06
+   },
+   "right_mae": {
+    "mean": 0.00027430555201135576,
+    "std": 5.202788626547225e-06
+   },
+   "interior_mae": {
+    "mean": 0.0002606119718014573,
+    "std": 2.536334000317505e-05
+   },
+   "ood_mean_rel_l2": {
+    "mean": 0.05010720218221346,
+    "std": 0.005083220747756631
+   }
+  }
+ },
+ "padding_note": "Padding comparison, 3 seeds each (mean \u00b1 std): test rel L2 pad0 0.129% \u00b1 0.003% vs pad 0.25 0.135% \u00b1 0.004%; right-boundary MAE 4.4e-04 vs 2.7e-04 (padding helps only there)."
 }
