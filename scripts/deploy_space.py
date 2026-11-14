@@ -10,7 +10,7 @@ import sys
 import time
 from pathlib import Path
 
-import requests
+import httpx
 from huggingface_hub import HfApi, get_token
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,16 +46,16 @@ while time.time() - t0 < 1800:
 if last != "RUNNING":
     hdr = {"Authorization": f"Bearer {get_token()}"}  # used only in the request header, never printed
     for kind in ("build", "run"):
-        r = requests.get(f"https://huggingface.co/api/spaces/{repo_id}/logs/{kind}", headers=hdr, stream=True, timeout=30)
         lines = []
-        for raw in r.iter_lines():
-            if raw.startswith(b"data:"):
-                try:
-                    lines.append(json.loads(raw[5:]).get("data", "").rstrip())
-                except json.JSONDecodeError:
-                    pass
-            if len(lines) > 400:
-                break
+        with httpx.stream("GET", f"https://huggingface.co/api/spaces/{repo_id}/logs/{kind}", headers=hdr, timeout=30) as r:
+            for raw in r.iter_lines():
+                if raw.startswith("data:"):
+                    try:
+                        lines.append(json.loads(raw[5:]).get("data", "").rstrip())
+                    except json.JSONDecodeError:
+                        pass
+                if len(lines) > 400:
+                    break
         print(f"----- {kind} log (last 60 lines) -----")
         print("\n".join(lines[-60:]))
 

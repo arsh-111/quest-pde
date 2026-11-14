@@ -1,0 +1,16 @@
+{
+ "target": "Hugging Face Space HarshalShirke/sorption-surrogate-lab (Docker SDK, cpu-basic, public)",
+ "attempted": "2026-11-14 15:27 IST",
+ "result": "refused at repo creation: HTTP 402 Payment Required (POST /api/repos/create)",
+ "hub_message": "Static Spaces are free for everyone, but hosting Gradio and Docker Spaces on free cpu-basic requires a PRO subscription. Subscribe at https://huggingface.co/pro",
+ "created_or_uploaded": "nothing (create_repo failed before upload)",
+ "server_memory_probe": {
+  "rss_mb": 514,
+  "uss_mb": 345,
+  "platform": "Windows dev laptop, after compare (256/1024/pulse), benchmark and physics sweep requests",
+  "relevance": "typical free container tiers (e.g. 512 MB) would leave no headroom"
+ },
+ "staged_build_context_mb": 27.5,
+ "staged_context_local_smoke_test": "server started from the staged folder alone; /api/health, /api/compare, static Plotly and / returned 200",
+ "decision": "user chose not to deploy (options offered: HF PRO, Render free tier, static in-browser rewrite, no deploy)"
+}

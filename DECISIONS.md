@@ -73,3 +73,23 @@ Format: decision | alternatives | evidence.
     - Uptake, its time integral, is robust: ensemble vs data 0.11%.
 20. **Dataset-style curve = interpolation of K=256 stored trajectories in c** | K=128 (0.093%), K=3200 (316 MB) | K=256: 0.051% from held-out data, far below the 1.44% gap it illustrates; 22 MB compressed. Total committed assets: 32 MB.
 21. **Data efficiency: 25 training samples are enough at this step budget.** With 6000 steps for every size, best val stays at 0.159-0.171% for n_train 25…3200. Error is limited by optimisation and model capacity, not data. Single seed per size.
+22. **Padding re-run with 3 seeds (about 15 min of compute, within the 20-minute budget).** `results/padding_3seeds.json`.
+    - Test rel L2: pad0 0.129% ± 0.003%, pad 0.25 0.135% ± 0.004%.
+    - Right-boundary MAE: 4.4e-4 vs 2.7e-4.
+    - OOD mean: 5.2% vs 5.0% (within noise).
+    - The single-seed conclusion (decision 16) holds: padding helps only at the non-periodic right boundary.
+23. **The interpolation baseline is selectable in the app, and the model guide is generated from the per-family results, not a blanket claim** | "FNO helps for non-flat ICs" | `results/eval_metrics.json`.
+    - That blanket claim was false for noise ICs: interpolation from the mean level is better there (1.54% vs 2.15%), because noise smooths out within the first steps. The guide text now lists, family by family, where each model wins.
+24. **Payloads: gzip level 5 and 5-decimal rounding** | no gzip | `results/gzip_tradeoff.json`, `results/latency.json`.
+    - /api/compare goes from 793 KB to 246 KB on the wire.
+    - Gzip costs about 54 ms of CPU on localhost. It is kept because it saves bandwidth on any real network (break-even about 65 Mbit/s).
+25. **Plotly vendored locally: the cartesian partial build 2.35.2 (1.33 MB, 450 KB gzipped)** | CDN.
+    - The CDN link I first used (cdnjs) was a 404 for this version.
+    - The npm tarball's SHA-512 was verified against the registry's `dist.integrity` before extraction.
+26. **Batch benchmark uses medians of individually timed repetitions** | mean of a batch.
+    - Your browser reopened during the run, and laptop timings were 2-3× slower than in the quiet earlier measurement. Medians do not remove a systematic slowdown, so the UI and README state the measurement conditions.
+27. **Not deployed (user decision).**
+    - Hugging Face refused to create the Docker Space with HTTP 402: free CPU Docker/Gradio Spaces now need PRO (`results/deploy_attempt.json`).
+    - The server measured 514 MB RSS under load, leaving no headroom on 512 MB free container tiers.
+    - Options offered to the user: PRO, Render free tier, an in-browser static rewrite, no deploy. They chose no deploy.
+    - The Dockerfile, the staged-context script and the deploy script are kept and were smoke-tested locally from the staged folder.
