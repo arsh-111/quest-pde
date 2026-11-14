@@ -87,7 +87,8 @@ def train_run(spec: dict, data: dict, dev, log=print) -> dict:
     TMP.mkdir(exist_ok=True)
     state_path = TMP / f"{name}.state.pt"
     if state_path.exists():
-        st = torch.load(state_path, map_location=dev, weights_only=False)
+        # load on the CPU: the RNG state must stay a CPU ByteTensor; load_state_dict moves model/optimizer tensors
+        st = torch.load(state_path, map_location="cpu", weights_only=False)
         model.load_state_dict(st["model"]); opt.load_state_dict(st["opt"]); sched.load_state_dict(st["sched"])
         gen.set_state(st["gen"]); hist, best, best_state = st["hist"], st["best"], st["best_state"]
         start_ep, t_prev = st["epoch"], st["seconds"]
