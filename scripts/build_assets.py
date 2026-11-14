@@ -53,8 +53,12 @@ summary = {
     "trust": {"supported": supported, "spearman_test": sp_t, "spearman_ood": sp_o,
               "card_note": (f"evidence-backed: Spearman vs error {sp_t['rho']:.2f} (test), {sp_o['rho']:.2f} (OOD)"
                             if supported else
-                            f"raw value only: rank correlation with true error is {sp_t['rho']:.2f} on test, "
-                            f"{sp_o['rho']:.2f} on OOD")},
+                            f"raw value, not an error estimate (rank corr. with error {sp_t['rho']:.2f} in-distribution). "
+                            f"Above {tr['spread_threshold_p99_test']:.1e} it signals an unfamiliar input: seen in "
+                            f"≥{min(v for k, v in tr['ood_flagged_fraction_by_category'].items() if k != 'const_in'):.0%} of "
+                            f"OOD cases in every family vs {tr['ood_flagged_fraction_by_category'].get('const_in', 0):.0%} "
+                            "of in-distribution controls"),
+              "flag_threshold": tr["spread_threshold_p99_test"]},
     "timing_cpu": ev["timing_cpu"],
     "explainer_html": (
         f"<b>Accurate solver</b> (black): the PDEBench equations solved with an implicit BDF2/Newton scheme on the same "
@@ -69,7 +73,11 @@ summary = {
     "observables_html": (
         "The breakthrough curve at x = 1 is not shown: the outflow boundary u = D·∂u/∂x with D = 5e-4 keeps u(1) ≈ 0, "
         "so it is flat in every sample. Instead: the concentration at a chosen x, the position of the u = 0.5 front, "
-        "and the total amount that has entered the column (uptake). " + dv.get("ui_note", "")),
+        "and the total amount that has entered the column (uptake). The inflow flux at x = 0 is not shown either: it "
+        "depends on 1 − u in the first cell, and even the PDEBench data differs from the accurate solver there by "
+        f"{pct(dv['outputs']['inflow_flux_x0']['data_vs_solver_rel_l2'])} (the surrogate: "
+        f"{pct(dv['outputs']['inflow_flux_x0']['ensemble_vs_data_rel_l2'])} vs data). Uptake is its time integral and is "
+        f"robust: ensemble vs data {pct(dv['outputs']['uptake']['ensemble_vs_data_rel_l2'])}."),
     "footer_html": (f"Ensemble: 5 × FNO ({pc['chosen']}), trained on 3,200 PDEBench samples (keys 0000–3199); "
                     "test keys 3600–3999. All numbers on this page come from results/*.json produced in this project."),
 }

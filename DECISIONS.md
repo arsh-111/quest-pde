@@ -54,3 +54,22 @@ Format: decision | alternatives | evidence.
     - It logs memory before each run, saves resumable state about every 1000 steps, and aborts (no retry) below 1.5 GB of available RAM.
     - The finished CNN baseline (`cnn_s0`, best val 1.38e-3) from the killed stage is kept.
 15. **Data-efficiency sweep** | none | because the input is a scalar, few samples may suffice. FNO, seed 0, n_train ∈ {25 … 3200}, fixed budget of 6000 optimiser steps for every size, so only the data size changes.
+16. **Padding: pad0 is used for the ensemble, but it is effectively a tie** | pad 0.25 | single-seed best val 1.257e-3 (pad0) vs 1.285e-3 (pad25); test 0.127% vs 0.131%.
+    - Padding does reduce the right-boundary error (right-4-point MAE 2.8e-4 vs 4.7e-4).
+    - The left boundary, where the steep front sits (MAE 1.7e-3 for both), dominates the total error.
+    - Source: `results/RESULTS.md`.
+17. **The neural surrogates are not the most accurate in-distribution model, and this is reported plainly.**
+    - Linear interpolation in c between training trajectories: 0.009% mean test rel L2.
+    - FNO ensemble: 0.124%; CNN: 0.139%.
+    - All of them are 1.44% from the accurate solver, which is the dataset floor.
+    - The FNO's value is in extrapolation (c > 0.2: 8.6% vs 37% for interpolation, which can only clamp) and in non-constant ICs.
+18. **No "trust" indicator in the UI.** The rule fixed in `scripts/build_assets.py` before the evaluation was looked at was not met.
+    - Spread vs error, Spearman: 0.04 (p=0.44) on test and 0.97 on OOD.
+    - Residual vs error: 0.71 on test and 0.29 (p=0.05) on OOD.
+    - Spread above the test p99 (2.5e-4) flagged 100% of every OOD family and 0% of the in-distribution controls.
+    - The UI therefore shows the raw spread, labelled as an unfamiliar-input signal and not an error estimate. The rule-based OOD flag stays primary.
+19. **Observables shown: u at a selectable x, front position (u = 0.5), uptake. Not shown: breakthrough at x=1, inflow flux** | `results/derived_outputs.json`.
+    - Inflow flux at x=0 is unreliable even in the dataset (22.5% from the accurate solver; the surrogate is 19.6% from the data).
+    - Uptake, its time integral, is robust: ensemble vs data 0.11%.
+20. **Dataset-style curve = interpolation of K=256 stored trajectories in c** | K=128 (0.093%), K=3200 (316 MB) | K=256: 0.051% from held-out data, far below the 1.44% gap it illustrates; 22 MB compressed. Total committed assets: 32 MB.
+21. **Data efficiency: 25 training samples are enough at this step budget.** With 6000 steps for every size, best val stays at 0.159-0.171% for n_train 25…3200. Error is limited by optimisation and model capacity, not data. Single seed per size.

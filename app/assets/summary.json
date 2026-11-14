@@ -1,0 +1,131 @@
+{
+ "ensemble": "fno_pad0",
+ "test": {
+  "ensemble_vs_data": {
+   "mean": 0.0012377562234178185,
+   "median": 0.0011634496040642262,
+   "p95": 0.0015293103642761707,
+   "worst": 0.004084409214556217,
+   "n": 400
+  },
+  "ensemble_vs_solver": {
+   "mean": 0.014413070864975452,
+   "median": 0.014451345428824425,
+   "p95": 0.015255832113325596,
+   "worst": 0.016832081601023674,
+   "n": 400
+  },
+  "interp_vs_data": {
+   "mean": 8.767031249590218e-05,
+   "median": 1.9349419744685292e-05,
+   "p95": 0.0004256883985362947,
+   "worst": 0.001342123025096953,
+   "n": 400
+  },
+  "cnn_vs_data": {
+   "mean": 0.001386195421218872,
+   "median": 0.0013311506481841207,
+   "p95": 0.0017255707643926144,
+   "worst": 0.0029046665877103806,
+   "n": 400
+  },
+  "mean_trajectory_vs_data": {
+   "mean": 0.09437773376703262,
+   "median": 0.09306489676237106,
+   "p95": 0.1837281584739685,
+   "worst": 0.20687778294086456,
+   "n": 400
+  }
+ },
+ "data_vs_solver_floor": {
+  "mean": 0.014413172379136086,
+  "median": 0.01445288211107254,
+  "p95": 0.014911189675331116,
+  "worst": 0.014983110129833221,
+  "n": 400
+ },
+ "ood_table": [
+  {
+   "category": "const_in",
+   "mean": 0.014299211092293262,
+   "worst": 0.015445715747773647,
+   "n": 8
+  },
+  {
+   "category": "const_high",
+   "mean": 0.08624719083309174,
+   "worst": 0.20790311694145203,
+   "n": 8
+  },
+  {
+   "category": "smooth",
+   "mean": 0.02898254059255123,
+   "worst": 0.04093819484114647,
+   "n": 8
+  },
+  {
+   "category": "noise",
+   "mean": 0.02150115929543972,
+   "worst": 0.02664085291326046,
+   "n": 8
+  },
+  {
+   "category": "pulse",
+   "mean": 0.06787232309579849,
+   "worst": 0.07919509708881378,
+   "n": 8
+  },
+  {
+   "category": "step",
+   "mean": 0.0681140348315239,
+   "worst": 0.08911171555519104,
+   "n": 6
+  }
+ ],
+ "ood_note": "const_in is a solver-generated in-distribution control; its error is the dataset-vs-solver floor (~1.44%) plus the surrogate's own error.",
+ "trust": {
+  "supported": false,
+  "spearman_test": {
+   "rho": 0.039105994412465074,
+   "p": 0.435408159980855,
+   "n": 400
+  },
+  "spearman_ood": {
+   "rho": 0.9678075855689177,
+   "p": 5.3643484419094555e-28,
+   "n": 46
+  },
+  "card_note": "raw value, not an error estimate (rank corr. with error 0.04 in-distribution). Above 2.5e-04 it signals an unfamiliar input: seen in \u2265100% of OOD cases in every family vs 0% of in-distribution controls",
+  "flag_threshold": 0.00024553079856559634
+ },
+ "timing_cpu": {
+  "cnn_s0": {
+   "batch1_s": 0.0020562599999720986,
+   "batch100_per_sample_s": 0.0007011193333346455
+  },
+  "fno_pad0_s0": {
+   "batch1_s": 0.005047375000049215,
+   "batch100_per_sample_s": 0.0004442203333322444
+  },
+  "fno_pad25_s0": {
+   "batch1_s": 0.005961575000037555,
+   "batch100_per_sample_s": 0.0005787333333319111
+  },
+  "ensemble5": {
+   "batch1_s": 0.029135479999968083,
+   "batch100_per_sample_s": 0.0027341345000058935
+  },
+  "solver_1024_dt0.5": {
+   "per_sample_s": 0.7767331999997017
+  },
+  "solver_1024_dt1": {
+   "per_sample_s": 0.3413318333332427
+  },
+  "solver_256_dt1": {
+   "per_sample_s": 0.28835846666637127
+  }
+ },
+ "explainer_html": "<b>Accurate solver</b> (black): the PDEBench equations solved with an implicit BDF2/Newton scheme on the same 1024-cell grid; it agrees with a tight-tolerance reference to 2.4e-04 (relative L2) at the step used here. <b>Dataset-style</b> (orange): interpolation between stored PDEBench trajectories. The generator integrated with SciPy RK45 at default tolerances, which leaves a 1.45% relative-L2 time-integration error that grows with t. <b>Surrogate</b> (blue): trained on the dataset, so it reproduces the dataset (0.12% mean on held-out test samples) and inherits its offset from the accurate solution (1.44%). Shown only for spatially constant ICs at the training physics.",
+ "observables_html": "The breakthrough curve at x = 1 is not shown: the outflow boundary u = D\u00b7\u2202u/\u2202x with D = 5e-4 keeps u(1) \u2248 0, so it is flat in every sample. Instead: the concentration at a chosen x, the position of the u = 0.5 front, and the total amount that has entered the column (uptake). The inflow flux at x = 0 is not shown either: it depends on 1 \u2212 u in the first cell, and even the PDEBench data differs from the accurate solver there by 22.54% (the surrogate: 19.63% vs data). Uptake is its time integral and is robust: ensemble vs data 0.11%.",
+ "footer_html": "Ensemble: 5 \u00d7 FNO (fno_pad0), trained on 3,200 PDEBench samples (keys 0000\u20133199); test keys 3600\u20133999. All numbers on this page come from results/*.json produced in this project."
+}

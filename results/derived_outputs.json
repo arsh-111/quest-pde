@@ -1,0 +1,115 @@
+{
+ "ensemble_prefix": "fno_pad0",
+ "outputs": {
+  "u_at_x=0.1": {
+   "sensitivity_to_c_std_over_mean": 0.03333771973848343,
+   "mean_magnitude": 0.6893050074577332,
+   "ensemble_vs_data_rel_l2": 0.00025437818840146065,
+   "ensemble_vs_data_nan_mismatch": 0,
+   "ensemble_vs_solver_rel_l2": 0.016054535284638405,
+   "ensemble_vs_solver_nan_mismatch": 0,
+   "interp_c_vs_data_rel_l2": 1.2168183616267925e-07,
+   "interp_c_vs_data_nan_mismatch": 0,
+   "data_vs_solver_rel_l2": 0.01603091135621071,
+   "data_vs_solver_nan_mismatch": 0,
+   "c_signal_over_ensemble_error": 131.0557322071565
+  },
+  "u_at_x=0.25": {
+   "sensitivity_to_c_std_over_mean": 0.11581340432167053,
+   "mean_magnitude": 0.37523505091667175,
+   "ensemble_vs_data_rel_l2": 0.0007818657904863358,
+   "ensemble_vs_data_nan_mismatch": 0,
+   "ensemble_vs_solver_rel_l2": 0.014237520284950733,
+   "ensemble_vs_solver_nan_mismatch": 0,
+   "interp_c_vs_data_rel_l2": 1.091185310997389e-07,
+   "interp_c_vs_data_nan_mismatch": 0,
+   "data_vs_solver_rel_l2": 0.014140767976641655,
+   "data_vs_solver_nan_mismatch": 0,
+   "c_signal_over_ensemble_error": 148.1244041252046
+  },
+  "u_at_x=0.5": {
+   "sensitivity_to_c_std_over_mean": 0.351907342672348,
+   "mean_magnitude": 0.15067055821418762,
+   "ensemble_vs_data_rel_l2": 0.0018295509507879615,
+   "ensemble_vs_data_nan_mismatch": 0,
+   "ensemble_vs_solver_rel_l2": 0.008838091976940632,
+   "ensemble_vs_solver_nan_mismatch": 0,
+   "interp_c_vs_data_rel_l2": 1.6695130966581928e-07,
+   "interp_c_vs_data_nan_mismatch": 0,
+   "data_vs_solver_rel_l2": 0.008516156114637852,
+   "data_vs_solver_nan_mismatch": 0,
+   "c_signal_over_ensemble_error": 192.34629269044765
+  },
+  "front_position_u0.5": {
+   "sensitivity_to_c_std_over_mean": 0.08349652716585086,
+   "mean_magnitude": 0.19568566285161423,
+   "ensemble_vs_data_rel_l2": 0.0005047780400710615,
+   "ensemble_vs_data_nan_mismatch": 0,
+   "ensemble_vs_solver_rel_l2": 0.016986162557108407,
+   "ensemble_vs_solver_nan_mismatch": 0,
+   "interp_c_vs_data_rel_l2": 1.9580146858844932e-07,
+   "interp_c_vs_data_nan_mismatch": 0,
+   "data_vs_solver_rel_l2": 0.016945967703608067,
+   "data_vs_solver_nan_mismatch": 0,
+   "c_signal_over_ensemble_error": 165.41236055771446
+  },
+  "uptake": {
+   "sensitivity_to_c_std_over_mean": 0.15110333185902142,
+   "mean_magnitude": 0.5746254041297508,
+   "ensemble_vs_data_rel_l2": 0.0011337530554204893,
+   "ensemble_vs_data_nan_mismatch": 0,
+   "ensemble_vs_solver_rel_l2": 0.01846368521221645,
+   "ensemble_vs_solver_nan_mismatch": 0,
+   "interp_c_vs_data_rel_l2": 6.253241172388235e-05,
+   "interp_c_vs_data_nan_mismatch": 0,
+   "data_vs_solver_rel_l2": 0.01833752741334975,
+   "data_vs_solver_nan_mismatch": 0,
+   "c_signal_over_ensemble_error": 133.27711103982853
+  },
+  "inflow_flux_x0": {
+   "sensitivity_to_c_std_over_mean": 0.18219596147537231,
+   "mean_magnitude": 0.0013313089730218053,
+   "ensemble_vs_data_rel_l2": 0.19630520045757294,
+   "ensemble_vs_data_nan_mismatch": 0,
+   "ensemble_vs_solver_rel_l2": 0.1748993843793869,
+   "ensemble_vs_solver_nan_mismatch": 0,
+   "interp_c_vs_data_rel_l2": 0.018948277458548546,
+   "interp_c_vs_data_nan_mismatch": 0,
+   "data_vs_solver_rel_l2": 0.2254057377576828,
+   "data_vs_solver_nan_mismatch": 0,
+   "c_signal_over_ensemble_error": 0.9281260050711188
+  }
+ },
+ "dataset_lookup_table": {
+  "32": {
+   "mean_rel_l2_vs_data": 0.001266434439457953,
+   "max": 0.0018148887902498245,
+   "size_mb_float32": 3.2
+  },
+  "64": {
+   "mean_rel_l2_vs_data": 0.001151779550127685,
+   "max": 0.001767193665727973,
+   "size_mb_float32": 6.3
+  },
+  "128": {
+   "mean_rel_l2_vs_data": 0.0009264559485018253,
+   "max": 0.0017215448897331953,
+   "size_mb_float32": 12.6
+  },
+  "256": {
+   "mean_rel_l2_vs_data": 0.0005080152186565101,
+   "max": 0.0013737175613641739,
+   "size_mb_float32": 25.2
+  },
+  "512": {
+   "mean_rel_l2_vs_data": 0.0002720235788729042,
+   "max": 0.0013668278697878122,
+   "size_mb_float32": 50.5
+  },
+  "3200": {
+   "mean_rel_l2_vs_data": 8.767031249590218e-05,
+   "max": 0.001342123025096953,
+   "size_mb_float32": 315.6
+  }
+ }
+}
