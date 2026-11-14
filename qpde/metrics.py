@@ -32,10 +32,11 @@ def error_vs_t(pred, true):
 def boundary_errors(pred, true, k=4):
     """Errors at the first/last k grid points, the interior, and on the breakthrough curve u(t, x_last)."""
     e = np.abs(pred - true)
-    bt = rel_l2(pred[:, :, -1:], true[:, :, -1:])
+    # u at the last point is ~1e-3 (outflow BC pins it near 0), so a relative error there is meaningless:
+    # report the absolute error next to the typical magnitude instead.
     return {"left_mae": float(e[..., :k].mean()), "right_mae": float(e[..., -k:].mean()),
             "interior_mae": float(e[..., k:-k].mean()),
-            "breakthrough_rel_l2": summary(bt)}
+            "last_point_mae": float(e[..., -1].mean()), "last_point_mean_abs_u": float(np.abs(true[..., -1]).mean())}
 
 
 def total_mass(u, x, p: PhysParams = DEFAULT):
@@ -53,24 +54,6 @@ def mass_error(pred, true, x):
     mp, mt = total_mass(pred, x), total_mass(true, x)
     return {"mean_rel_abs_mass_error": float((np.abs(mp - mt) / np.abs(mt)).mean()),
             "max_rel_abs_mass_error": float((np.abs(mp - mt) / np.abs(mt)).max())}
-
-
-def flux_balance_residual(u, t, x, p: PhysParams = DEFAULT):
-    """|dM/dt - (flux_in - flux_out)| / |flux_in| per sample (mean over time), from one-sided differences.
-
-    flux_in = D (sol - u_0) / (x_0 - 0) at the left (Dirichlet), flux_out ~ D (u_{N-2} - u_{N-1}) / dx is
-    replaced by the discrete outflow that follows from the generator's right-ghost rule. This is approximate on
-    a strided grid, so it is only meaningful as a COMPARISON between the surrogate and the ground truth
-    evaluated in the same way.
-    """
-    M = total_mass(u, x, p)
-    dMdt = np.gradient(M, t, axis=1)
-    dx = x[1] - x[0]
-    fin = p.D * (p.sol - u[..., 0]) / (x[0] + 1e-12) / 2 * 1.0  # u_0 sits half a fine cell from the wall
-    ghost = p.D * (u[..., -2] - u[..., -1]) / dx
-    fout = p.D * (u[..., -1] - ghost) / dx
-    r = np.abs(dMdt - (fin - fout))
-    return (r / (np.abs(fin) + 1e-12)).mean(axis=1)
 
 
 def spearman(a, b):
