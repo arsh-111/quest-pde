@@ -1,0 +1,161 @@
+{
+ "url": "http://127.0.0.1:8765",
+ "passed": 30,
+ "total": 30,
+ "checks": [
+  {
+   "check": "initial render",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "card: surrogate vs solver",
+   "ok": true,
+   "detail": "1.44% vs api 1.44%"
+  },
+  {
+   "check": "card: surrogate vs dataset-style",
+   "ok": true,
+   "detail": "0.084% vs api 0.084%"
+  },
+  {
+   "check": "card: dataset-style vs accurate",
+   "ok": true,
+   "detail": "1.44% vs api 1.44%"
+  },
+  {
+   "check": "no OOD banner at c=0.1",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "profile shows three curves in distribution",
+   "ok": true,
+   "detail": "3 traces"
+  },
+  {
+   "check": "explainer shows dataset tolerance error from results",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "heatmaps rendered with 101 time rows",
+   "ok": true,
+   "detail": "[101, 101, 101]"
+  },
+  {
+   "check": "time slider updates profile to t index 60",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "render after c=0.35",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "OOD banner for c=0.35",
+   "ok": true,
+   "detail": "Out of distribution. IC values outside the training range (0.0, 0.2) (min 0.35, "
+  },
+  {
+   "check": "no dataset-style curve when OOD",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "render stress lab (pulse)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "OOD banner for pulse IC",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "OOD degradation table equals /api/meta",
+   "ok": true,
+   "detail": "6 rows"
+  },
+  {
+   "check": "render CSV upload IC",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "CSV IC flagged OOD",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "render physics lab (training values)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "physics lab at training values is in distribution",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "render physics lab (D=1e-3)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "D slider sends D=1e-3",
+   "ok": true,
+   "detail": "0.001"
+  },
+  {
+   "check": "surrogate unchanged by physics shift",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "error grows with physics shift",
+   "ok": true,
+   "detail": "0.0144 -> 0.1847"
+  },
+  {
+   "check": "sweep plotted",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "render at 1024 points",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "no horizontal scroll at 390 px",
+   "ok": true,
+   "detail": "scrollWidth 390 vs 390"
+  },
+  {
+   "check": "dark mode background applied",
+   "ok": true,
+   "detail": "rgb(21, 23, 26)"
+  },
+  {
+   "check": "no page errors",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "no console errors/warnings",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "check": "no failed requests (excluding deliberately aborted, superseded calls)",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "console_errors": [],
+ "page_errors": [],
+ "failed_requests": [],
+ "aborted_superseded_requests": 1
+}

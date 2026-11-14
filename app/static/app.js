@@ -58,10 +58,12 @@ function buildPhysics(meta) {
       `<label>${PHYS_LABEL[k]} <output id="ph-${k}-o"></output></label>
        <input type="range" id="ph-${k}" min="${toS(lo)}" max="${toS(hi)}" step="${(toS(hi) - toS(lo)) / 200}"
         value="${toS(d)}" data-log="${log}">`);
-    $("ph-" + k).dataset.default = toS(d);
+    // range inputs snap to their step grid, so remember the snapped position of the training value
+    const el = $("ph-" + k);
+    el.dataset.default = el.value;
     bindRange("ph-" + k, `ph-${k}-o`, (s) => {
-      const v = fromS(s), changed = Math.abs(v - d) > 1e-9 * Math.max(1, Math.abs(d));
-      return `${fmt(v, 4)}${changed ? "" : " (training)"}`;
+      const atDefault = s === +el.dataset.default;
+      return `${fmt(atDefault ? d : fromS(s), 4)}${atDefault ? " (training)" : ""}`;
     });
     sel.insertAdjacentHTML("beforeend", `<option value="${k}">${PHYS_LABEL[k]}</option>`);
   }
@@ -72,7 +74,7 @@ function physValues() {
   for (const k of Object.keys(S.meta.param_ranges)) {
     const el = $("ph-" + k), s = +el.value;
     let v = el.dataset.log === "true" ? 10 ** s : s;
-    if (Math.abs(s - +el.dataset.default) < 1e-12) v = S.meta.params_default[k]; // exact training value
+    if (s === +el.dataset.default) v = S.meta.params_default[k]; // snapped training position -> exact training value
     p[k] = v;
   }
   return p;
@@ -184,7 +186,7 @@ function drawObs(nt) {
       line: { color, dash, width: s === "solver" ? 3 : 2 } }));
     Plotly.react(div, tr, { title: { text: title, font: { size: 13 } }, margin: { l: 50, r: 10, t: 30, b: 36 },
       paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)", font: { color: css("--ink"), size: 11 },
-      showlegend: div === "obs-conc", legend: { orientation: "h", y: -0.25 },
+      showlegend: false, // same line styles as the profile legend above
       xaxis: { title: "t [s]", gridcolor: css("--line") }, yaxis: { title: ytitle, gridcolor: css("--line") } },
       { displayModeBar: false, responsive: true });
   };
@@ -195,7 +197,8 @@ function drawObs(nt) {
 
 function explain(r) {
   const ev = S.meta.evaluation || {};
-  $("explainer").innerHTML = ev.explainer_html || "";
+  $("explainer").innerHTML = (ev.explainer_html || "") +
+    ((ev.trust || {}).spread_html ? "<p>" + ev.trust.spread_html + "</p>" : "");
   $("obs-explain").innerHTML = ev.observables_html || "";
 }
 
@@ -219,7 +222,9 @@ async function runSweep() {
       { margin: { l: 54, r: 10, t: 10, b: 44 }, paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
         font: { color: css("--ink"), size: 11 },
         shapes: [{ type: "line", x0: r.default, x1: r.default, yref: "paper", y0: 0, y1: 1, line: { dash: "dot", color: css("--muted") } }],
-        xaxis: { title: PHYS_LABEL[r.param] + " (dotted = training value)", type: LOG_PARAMS.has(r.param) ? "log" : "linear", gridcolor: css("--line") },
+        xaxis: { title: PHYS_LABEL[r.param] + " (dotted = training value)", type: LOG_PARAMS.has(r.param) ? "log" : "linear",
+                 tickformat: LOG_PARAMS.has(r.param) ? ".1e" : "", dtick: LOG_PARAMS.has(r.param) ? "D2" : undefined,
+                 gridcolor: css("--line") },
         yaxis: { title: "relative L2 [%]", type: "log", gridcolor: css("--line") } }, { displayModeBar: false, responsive: true });
   } catch (e) { banner("bad", "Sweep failed: " + e.message); }
   $("run-sweep").textContent = "Run sweep";

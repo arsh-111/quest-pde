@@ -19,11 +19,12 @@ A = ROOT / "app" / "assets"
 A.mkdir(parents=True, exist_ok=True)
 K = int(sys.argv[1]) if len(sys.argv) > 1 else 256
 
-train = np.load(ROOT / "data" / "cache" / "train.npy", mmap_mode="r")
-c = np.asarray(train[:, 0].mean(1))
-order = np.argsort(c)
-pick = order[np.linspace(0, len(order) - 1, K).astype(int)]
-np.savez_compressed(A / "dataset_table.npz", c=c[pick].astype(np.float64), u=np.asarray(train[pick], dtype=np.float32))
+if "--table" in sys.argv or not (A / "dataset_table.npz").exists():  # opt-in: avoids re-committing 22 MB
+    train = np.load(ROOT / "data" / "cache" / "train.npy", mmap_mode="r")
+    c = np.asarray(train[:, 0].mean(1))
+    order = np.argsort(c)
+    pick = order[np.linspace(0, len(order) - 1, K).astype(int)]
+    np.savez_compressed(A / "dataset_table.npz", c=c[pick].astype(np.float64), u=np.asarray(train[pick], dtype=np.float32))
 
 ev = json.loads((R / "eval_metrics.json").read_text())
 sv = json.loads((R / "solver_validation.json").read_text())["summary"]
@@ -53,11 +54,13 @@ summary = {
     "trust": {"supported": supported, "spearman_test": sp_t, "spearman_ood": sp_o,
               "card_note": (f"evidence-backed: Spearman vs error {sp_t['rho']:.2f} (test), {sp_o['rho']:.2f} (OOD)"
                             if supported else
-                            f"raw value, not an error estimate (rank corr. with error {sp_t['rho']:.2f} in-distribution). "
-                            f"Above {tr['spread_threshold_p99_test']:.1e} it signals an unfamiliar input: seen in "
-                            f"≥{min(v for k, v in tr['ood_flagged_fraction_by_category'].items() if k != 'const_in'):.0%} of "
-                            f"OOD cases in every family vs {tr['ood_flagged_fraction_by_category'].get('const_in', 0):.0%} "
-                            "of in-distribution controls"),
+                            f"not an error estimate; above {tr['spread_threshold_p99_test']:.1e} = unfamiliar input"),
+              "spread_html": (
+                  f"<b>Ensemble spread</b> is shown as a raw number, not as a trust score. In-distribution it does not rank the "
+                  f"true error (Spearman {sp_t['rho']:.2f}, p = {sp_t['p']:.2f}); on the OOD set it does ({sp_o['rho']:.2f}). "
+                  f"Above {tr['spread_threshold_p99_test']:.1e} (99th percentile of test spread) it flagged "
+                  + ", ".join(f"{k} {v:.0%}" for k, v in tr['ood_flagged_fraction_by_category'].items())
+                  + " of the held-out OOD set, so read a large spread as 'unlike the training data', not as an error size."),
               "flag_threshold": tr["spread_threshold_p99_test"]},
     "timing_cpu": ev["timing_cpu"],
     "explainer_html": (

@@ -95,7 +95,8 @@
    "p": 5.3643484419094555e-28,
    "n": 46
   },
-  "card_note": "raw value, not an error estimate (rank corr. with error 0.04 in-distribution). Above 2.5e-04 it signals an unfamiliar input: seen in \u2265100% of OOD cases in every family vs 0% of in-distribution controls",
+  "card_note": "not an error estimate; above 2.5e-04 = unfamiliar input",
+  "spread_html": "<b>Ensemble spread</b> is shown as a raw number, not as a trust score. In-distribution it does not rank the true error (Spearman 0.04, p = 0.44); on the OOD set it does (0.97). Above 2.5e-04 (99th percentile of test spread) it flagged const_in 0%, const_high 100%, smooth 100%, noise 100%, pulse 100%, step 100% of the held-out OOD set, so read a large spread as 'unlike the training data', not as an error size.",
   "flag_threshold": 0.00024553079856559634
  },
  "timing_cpu": {
