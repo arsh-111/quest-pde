@@ -1,0 +1,205 @@
+{
+ "matched": [
+  "2",
+  "3e-8",
+  "1.4%",
+  "2.3e-8",
+  "5e-14",
+  "1e-5",
+  "0.01",
+  "1.54",
+  "4.06",
+  "4",
+  "8.8",
+  "87%",
+  "7",
+  "9",
+  "0.01%",
+  "0.009%",
+  "0.13%",
+  "0.00%",
+  "1%",
+  "11",
+  "12",
+  "18.5%",
+  "13",
+  "14",
+  "15",
+  "16",
+  "514",
+  "27"
+ ],
+ "whitelisted": [
+  {
+   "token": "5",
+   "source": "dt = 5 s / seed count"
+  },
+  {
+   "token": "402",
+   "source": "HTTP status (results/deploy_attempt.json)"
+  },
+  {
+   "token": "6",
+   "source": "OOD per family (min)"
+  },
+  {
+   "token": "1",
+   "source": "BC value / dt"
+  },
+  {
+   "token": "1e-6",
+   "source": "generator regulariser in R(u)"
+  },
+  {
+   "token": "5e-4",
+   "source": "generator config D"
+  },
+  {
+   "token": "0.29",
+   "source": "generator config por"
+  },
+  {
+   "token": "2880",
+   "source": "generator config rho_s"
+  },
+  {
+   "token": "3.5e-4",
+   "source": "generator config k_f"
+  },
+  {
+   "token": "0.874",
+   "source": "generator config n_f"
+  },
+  {
+   "token": "1024",
+   "source": "grid cells (data shape)"
+  },
+  {
+   "token": "1",
+   "source": "BC value / dt"
+  },
+  {
+   "token": "0",
+   "source": "range bound"
+  },
+  {
+   "token": "0.2",
+   "source": "training IC range"
+  },
+  {
+   "token": "501",
+   "source": "config tdim"
+  },
+  {
+   "token": "101",
+   "source": "stored times (data shape)"
+  },
+  {
+   "token": "0",
+   "source": "range bound"
+  },
+  {
+   "token": "10,000",
+   "source": "samples (data)"
+  },
+  {
+   "token": "101",
+   "source": "stored times (data shape)"
+  },
+  {
+   "token": "1024",
+   "source": "grid cells (data shape)"
+  },
+  {
+   "token": "20",
+   "source": "validation samples"
+  },
+  {
+   "token": "1e-3",
+   "source": "solve_ivp default rtol"
+  },
+  {
+   "token": "0.5",
+   "source": "solver dt / front level"
+  },
+  {
+   "token": "3",
+   "source": "seeds (padding)"
+  },
+  {
+   "token": "6000",
+   "source": "sweep optimiser steps"
+  },
+  {
+   "token": "10",
+   "source": "latency calls"
+  },
+  {
+   "token": "38",
+   "source": "UI checks (results/ui_check.json total)"
+  },
+  {
+   "token": "390",
+   "source": "phone width px"
+  },
+  {
+   "token": "46",
+   "source": "OOD set size"
+  },
+  {
+   "token": "8",
+   "source": "max OOD samples per family"
+  },
+  {
+   "token": "10%",
+   "source": "1.0 -> 1.1"
+  },
+  {
+   "token": "404",
+   "source": "HTTP status of the broken CDN URL"
+  },
+  {
+   "token": "17",
+   "source": "checkpoints"
+  },
+  {
+   "token": "402",
+   "source": "HTTP status (results/deploy_attempt.json)"
+  },
+  {
+   "token": "512",
+   "source": "typical free-tier MB"
+  },
+  {
+   "token": "7860",
+   "source": "Space port"
+  }
+ ],
+ "unmatched": [],
+ "ratio_claims": [
+  {
+   "value": "1.54",
+   "ok": true
+  },
+  {
+   "value": "4.06",
+   "ok": true
+  },
+  {
+   "value": "8.8",
+   "ok": true
+  },
+  {
+   "value": "1.54",
+   "ok": true
+  },
+  {
+   "value": "4.06",
+   "ok": true
+  },
+  {
+   "value": "8.8",
+   "ok": true
+  }
+ ]
+}

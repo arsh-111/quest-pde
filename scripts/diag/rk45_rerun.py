@@ -1,6 +1,7 @@
 """Diagnostic: re-run the PDEBench generator's ODE (verbatim copy of Simulator.rc_ode) with solve_ivp RK45 at default
 tolerances on one held-out sample, and locate the discrepancy against the data and against qpde.solver."""
 import sys, time, json
+from pathlib import Path
 import numpy as np, h5py
 from scipy.integrate import solve_ivp
 from scipy.sparse import diags
@@ -35,3 +36,5 @@ out = {"key": key, "rk45_nfev": int(r.nfev), "rk45_seconds": round(rk_sec, 1),
 for name, a, b in [("rk45_vs_data", rk, d), ("mine_vs_data", mine, d), ("mine_vs_rk45", mine, rk)]:
     e = rel_t(a[1:], b[1:]); out[name + "_by_t"] = {f"t={t[i+1]:.0f}": round(float(e[i]), 5) for i in [0, 1, 4, 19, 49, 99]}
 print(json.dumps(out, indent=1))
+Path("results").mkdir(exist_ok=True)
+Path(f"results/diag_rk45_rerun_{key}.json").write_text(json.dumps(out, indent=1))

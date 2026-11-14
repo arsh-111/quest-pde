@@ -135,6 +135,19 @@ if pd.exists():
         f"right-boundary MAE {a0['right_mae']['mean']:.1e} vs {a1['right_mae']['mean']:.1e} (padding helps only there).")
 else:
     summary["padding_note"] = "Padding comparison: single seed (pad0 vs pad 0.25)."
+if bb.exists():
+    q, B_ = ev["timing_cpu"], {(r["method"], r["batch"]): r["ms_per_sample"] for r in summary["batch_benchmark"]["rows"]}
+    pairs = {"single FNO": (q["fno_pad0_s0"]["batch1_s"] * 1e3, B_[("single FNO", 1)]),
+             "5-FNO ensemble": (q["ensemble5"]["batch1_s"] * 1e3, B_[("5-FNO ensemble", 1)]),
+             "CNN": (q["cnn_s0"]["batch1_s"] * 1e3, B_[("CNN", 1)]),
+             "solver dt=1": (q["solver_1024_dt1"]["per_sample_s"] * 1e3, B_[("implicit solver (1024 cells, dt=1.0)", 1)]),
+             "solver dt=0.5": (q["solver_1024_dt0.5"]["per_sample_s"] * 1e3, B_[("implicit solver (1024 cells, dt=0.5)", 1)])}
+    f = {k: round(b / a_, 2) for k, (a_, b) in pairs.items()}
+    summary["timing_slowdown"] = {"factors_loaded_over_quiet": f, "min": min(f.values()), "max": max(f.values()),
+                                  "background": "Brave browser running (user-confirmed), "
+                                                f"~{summary['batch_benchmark']['background_cpu_percent_after']:.0f}% CPU"}
+bd = T[ens]["boundary"]
+summary["left_over_interior_mae"] = round(bd["left_mae"] / bd["interior_mae"], 1)
 summary["trust"]["card_note"] = (f"informational only; Spearman with true error: {sp_t['rho']:.2f} in range, "
                                  f"{sp_o['rho']:.2f} on OOD")
 (A / "summary.json").write_text(json.dumps(summary, indent=1))

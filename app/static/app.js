@@ -256,8 +256,9 @@ function benchTable() {
   const bb = (S.meta.evaluation || {}).batch_benchmark;
   if (!bb) return;
   $("bench-table").innerHTML = pivot(bb.rows, `ms per sample (${bb.statistic}). Measured ${bb.measured} on the development laptop ` +
-    `(${bb.threads} CPU threads, ~${Math.round(bb.background_cpu_percent_after)}% background CPU load); laptop timings varied 2–3× ` +
-    "with background load during this project. The solver runs one sample at a time, so its cost does not fall with batch size.");
+    `(${bb.threads} CPU threads, background load: ${(S.meta.evaluation.timing_slowdown || {}).background || "unknown"}). ` +
+    `Compared with an earlier quiet-machine run, batch-1 timings were ${(S.meta.evaluation.timing_slowdown || {}).min}–` +
+    `${(S.meta.evaluation.timing_slowdown || {}).max}× slower. The solver runs one sample at a time, so its cost does not fall with batch size.`);
 }
 
 async function runBench() {

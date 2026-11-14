@@ -332,5 +332,18 @@
    }
   }
  },
- "padding_note": "Padding comparison, 3 seeds each (mean \u00b1 std): test rel L2 pad0 0.129% \u00b1 0.003% vs pad 0.25 0.135% \u00b1 0.004%; right-boundary MAE 4.4e-04 vs 2.7e-04 (padding helps only there)."
+ "padding_note": "Padding comparison, 3 seeds each (mean \u00b1 std): test rel L2 pad0 0.129% \u00b1 0.003% vs pad 0.25 0.135% \u00b1 0.004%; right-boundary MAE 4.4e-04 vs 2.7e-04 (padding helps only there).",
+ "timing_slowdown": {
+  "factors_loaded_over_quiet": {
+   "single FNO": 1.54,
+   "5-FNO ensemble": 1.88,
+   "CNN": 4.06,
+   "solver dt=1": 2.68,
+   "solver dt=0.5": 1.6
+  },
+  "min": 1.54,
+  "max": 4.06,
+  "background": "Brave browser running (user-confirmed), ~11% CPU"
+ },
+ "left_over_interior_mae": 8.8
 }

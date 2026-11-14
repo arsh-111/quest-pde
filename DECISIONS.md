@@ -87,7 +87,7 @@ Format: decision | alternatives | evidence.
     - The CDN link I first used (cdnjs) was a 404 for this version.
     - The npm tarball's SHA-512 was verified against the registry's `dist.integrity` before extraction.
 26. **Batch benchmark uses medians of individually timed repetitions** | mean of a batch.
-    - Your browser reopened during the run, and laptop timings were 2-3× slower than in the quiet earlier measurement. Medians do not remove a systematic slowdown, so the UI and README state the measurement conditions.
+    - The Brave browser was running during the run (the user confirmed this), and batch-1 timings were 1.54–4.06× slower than in the quiet earlier measurement (computed in `app/assets/summary.json`, `timing_slowdown`; an earlier uncomputed "2-3×" was wrong). Medians do not remove a systematic slowdown, so the UI and README state the measurement conditions.
 27. **Not deployed (user decision).**
     - Hugging Face refused to create the Docker Space with HTTP 402: free CPU Docker/Gradio Spaces now need PRO (`results/deploy_attempt.json`).
     - The server measured 514 MB RSS under load, leaving no headroom on 512 MB free container tiers.
