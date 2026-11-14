@@ -9,3 +9,5 @@ Format: decision | alternatives | evidence.
    - Right BC: ghost value = D·(u[N-2]-u[N-1])/dx.
    - R(u) = 1 + (1-por)/por·rho_s·k_f·n_f·(u+1e-6)^(n_f-1).
 4. **Possible conflict with the brief:** the generator code makes the initial condition spatially *constant*, `u0 = ones * U(0, 0.2)`, not random noise. This is to be verified against the data.
+5. **h5py pinned to 3.11.0** | latest h5py, a pure-Python HDF5 reader | the latest wheel failed with "DLL load failed while importing h5pl: An Application Control policy has blocked this file"; 3.11.0 imports cleanly, and 3.10.0 fails with a numpy ABI error.
+6. **torch 2.6.0+cu124** | CPU build | `torch.cuda.is_available()` = True on the MX450; whether to train on CPU or GPU will be decided from measured epoch times.

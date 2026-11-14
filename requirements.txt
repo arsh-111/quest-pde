@@ -1,0 +1,10 @@
+# torch: install the CUDA build with --index-url https://download.pytorch.org/whl/cu124 (CPU build also works)
+torch==2.6.0
+numpy==2.5.4
+scipy==1.18.1
+# h5py 3.11.0: newer wheels' h5pl DLL was blocked by Windows Application Control on this machine; 3.10 is ABI-incompatible with numpy 2.x
+h5py==3.11.0
+matplotlib==3.11.2
+fastapi==0.162.7
+uvicorn[standard]
+pytest
