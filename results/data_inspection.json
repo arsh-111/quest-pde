@@ -46,7 +46,7 @@
   "sample_attrs_keys": [
     "config"
   ],
-  "sample0_config_yaml": "work_dir: ${hydra:runtime.cwd}\ndata_dir: ${work_dir}/data/\noutput_path: /pfs/work7/workspace/scratch/st_ac131224-pde_test/data//diff-sorp/train_0000.h5\nname: null\nsim:\n  D: 0.0005\n  por: 0.29\n  rho_s: 2880\n  k_f: 0.00035\n  n_f: 0.874\n  sol: 1.0\n  t: 500\n  tdim: 501\n  x_left: 0.0\n  x_right: 1.0\n  xdim: 1024\n  'n': 1\n  seed: 0\ndefault_mode: true\n",
+  "sample0_config_sim_block": "sim:\n  D: 0.0005\n  por: 0.29\n  rho_s: 2880\n  k_f: 0.00035\n  n_f: 0.874\n  sol: 1.0\n  t: 500\n  tdim: 501\n  x_left: 0.0\n  x_right: 1.0\n  xdim: 1024\n  'n': 1\n  seed: 0",
   "x": {
     "n": 1024,
     "first": 0.00048828125,

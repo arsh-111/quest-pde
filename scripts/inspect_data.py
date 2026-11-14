@@ -35,7 +35,12 @@ with h5py.File(path, "r") as f:
     info["sample_attrs_keys"] = list(g.attrs.keys())
     cfg = g.attrs.get("config")
     if cfg is not None:
-        info["sample0_config_yaml"] = str(cfg)
+        # keep only the physics block: the rest holds the generator's original cluster paths (third-party user ids)
+        lines = str(cfg).splitlines()
+        start = next((i for i, l in enumerate(lines) if l.startswith("sim:")), None)
+        if start is not None:
+            end = next((j for j in range(start + 1, len(lines)) if lines[j] and not lines[j].startswith(" ")), len(lines))
+            info["sample0_config_sim_block"] = "\n".join(lines[start:end])
     x = g["grid/x"][:]
     t = g["grid/t"][:]
     info["x"] = {"n": int(x.size), "first": float(x[0]), "last": float(x[-1]), "dx": float(x[1] - x[0])}
