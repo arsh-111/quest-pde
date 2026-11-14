@@ -258,6 +258,7 @@ Gzip trade-off on /api/compare (`results/gzip_tradeoff.json`): 792.9 KB → 245.
 | 14 | A memory-probe filter matched its own shell's command line and terminated it | Exit code 15 | Matched only the uvicorn process |
 | 15 | First batch benchmark ran under background load without saying so | Numbers well above the earlier run's | Medians, conditions recorded, both runs reported |
 | 17 | Quoted the slowdown as "2–3×" and the boundary ratio as "about 8×" without computing them (actual: 1.54–4.06×, 8.8×) | The README audit flagged ratio claims it could not verify | Both ratios computed into `summary.json`; UI, README and DECISIONS use the computed values |
+| 18 | The serving table `app/assets/dataset_table.npz` was never committed: the `*.npz` ignore rule meant for data caches also matched it, and every local and staged test read it from the working tree | Fresh-clone test in the final audit: 17 of 25 tests failed | Explicit `.gitignore` exceptions for `app/assets/*.npz` and `results/*.npz`; file committed; clone re-tested |
 | 16 | The dry-run evaluation output was committed once | Noticed in the commit list | Overwritten by the final run; the README cites only final files |
 
 ## Deployment

@@ -20,3 +20,7 @@ checkpoints_tmp/
 # secrets
 .env
 *.key
+
+# serving asset and result arrays ARE committed (found missing by the fresh-clone test)
+!app/assets/*.npz
+!results/*.npz

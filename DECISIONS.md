@@ -71,7 +71,7 @@ Format: decision | alternatives | evidence.
 19. **Observables shown: u at a selectable x, front position (u = 0.5), uptake. Not shown: breakthrough at x=1, inflow flux** | `results/derived_outputs.json`.
     - Inflow flux at x=0 is unreliable even in the dataset (22.5% from the accurate solver; the surrogate is 19.6% from the data).
     - Uptake, its time integral, is robust: ensemble vs data 0.11%.
-20. **Dataset-style curve = interpolation of K=256 stored trajectories in c** | K=128 (0.093%), K=3200 (316 MB) | K=256: 0.051% from held-out data, far below the 1.44% gap it illustrates; 22 MB compressed. Total committed assets: 32 MB.
+20. **Dataset-style curve = interpolation of K=256 stored trajectories in c** | K=128 (0.093%), K=3200 (316 MB) | K=256: 0.051% from held-out data, far below the 1.44% gap it illustrates; 22 MB compressed. (Correction: the table was in fact not committed until the final fresh-clone audit caught that `*.npz` was ignored.)
 21. **Data efficiency: 25 training samples are enough at this step budget.** With 6000 steps for every size, best val stays at 0.159-0.171% for n_train 25…3200. Error is limited by optimisation and model capacity, not data. Single seed per size.
 22. **Padding re-run with 3 seeds (about 15 min of compute, within the 20-minute budget).** `results/padding_3seeds.json`.
     - Test rel L2: pad0 0.129% ± 0.003%, pad 0.25 0.135% ± 0.004%.
