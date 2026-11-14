@@ -212,7 +212,8 @@ Gzip trade-off on /api/compare (`results/gzip_tradeoff.json`): 792.9 KB → 245.
   - no horizontal scroll at 390 px wide;
   - dark mode renders.
 
-  Results are in `results/ui_check.json`, screenshots in `figures/ui/`.
+  Results are in `results/ui_check.json`, screenshots in `figures/ui/`. The final run was against a server started from a fresh clone of this repository.
+- **Claim audit:** `scripts/audit_ui_claims.py` traces each quantitative UI claim to its results file and asserts equality (`results/ui_claims_audit.md`).
 
 ## Limitations
 
@@ -285,6 +286,7 @@ python -I scripts/eval_padding.py
 python -I scripts/batch_benchmark.py
 python -I scripts/build_assets.py 256 --table
 python -I scripts/make_report.py ; python -I scripts/make_readme_tables.py ; python -I scripts/audit_readme.py
+python -I scripts/audit_ui_claims.py   # after ui_check: every UI number traced to a results file
 python -m pytest -q tests
 python scripts/ui_check.py http://127.0.0.1:8765        # server running; needs Microsoft Edge (Playwright)
 python scripts/latency.py http://127.0.0.1:8765 ; python scripts/gzip_tradeoff.py http://127.0.0.1:8765

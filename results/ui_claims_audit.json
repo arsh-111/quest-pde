@@ -1,0 +1,554 @@
+{
+ "n": 40,
+ "failed": 0,
+ "claims": [
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "in-range ensemble error vs data",
+   "value_in_ui_payload": 0.0012377562234178185,
+   "source": "eval_metrics.json test.ensemble_mean.rel_l2_vs_data.mean",
+   "value_in_source": 0.0012377562234178185,
+   "equal": true,
+   "render_verified_by": "model guide in-range row shows interpolation number",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "in-range interpolation error (3,200 trajectories)",
+   "value_in_ui_payload": 8.767031249590218e-05,
+   "source": "eval_metrics.json test.interp_u0.rel_l2_vs_data.mean",
+   "value_in_source": 8.767031249590218e-05,
+   "equal": true,
+   "render_verified_by": "model guide in-range row shows interpolation number",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "in-range interpolation error (256-level app table)",
+   "value_in_ui_payload": 0.0005080152186565101,
+   "source": "derived_outputs.json dataset_lookup_table.256.mean_rel_l2_vs_data",
+   "value_in_source": 0.0005080152186565101,
+   "equal": true,
+   "render_verified_by": "model guide in-range row shows interpolation number",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD const_in ensemble",
+   "value_in_ui_payload": 0.014299211092293262,
+   "source": "eval_metrics.json ood.ensemble_mean.const_in.mean",
+   "value_in_source": 0.014299211092293262,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD const_in interp",
+   "value_in_ui_payload": 0.014316380023956299,
+   "source": "eval_metrics.json ood.interp_u0.const_in.mean",
+   "value_in_source": 0.014316380023956299,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD const_in cnn",
+   "value_in_ui_payload": 0.014322953298687935,
+   "source": "eval_metrics.json ood.cnn_s0.const_in.mean",
+   "value_in_source": 0.014322953298687935,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD const_high ensemble",
+   "value_in_ui_payload": 0.08624719083309174,
+   "source": "eval_metrics.json ood.ensemble_mean.const_high.mean",
+   "value_in_source": 0.08624719083309174,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD const_high interp",
+   "value_in_ui_payload": 0.3728988468647003,
+   "source": "eval_metrics.json ood.interp_u0.const_high.mean",
+   "value_in_source": 0.3728988468647003,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD const_high cnn",
+   "value_in_ui_payload": 0.0740937665104866,
+   "source": "eval_metrics.json ood.cnn_s0.const_high.mean",
+   "value_in_source": 0.0740937665104866,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD smooth ensemble",
+   "value_in_ui_payload": 0.02898254059255123,
+   "source": "eval_metrics.json ood.ensemble_mean.smooth.mean",
+   "value_in_source": 0.02898254059255123,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD smooth interp",
+   "value_in_ui_payload": 0.03427712991833687,
+   "source": "eval_metrics.json ood.interp_u0.smooth.mean",
+   "value_in_source": 0.03427712991833687,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD smooth cnn",
+   "value_in_ui_payload": 0.038359951227903366,
+   "source": "eval_metrics.json ood.cnn_s0.smooth.mean",
+   "value_in_source": 0.038359951227903366,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD noise ensemble",
+   "value_in_ui_payload": 0.02150115929543972,
+   "source": "eval_metrics.json ood.ensemble_mean.noise.mean",
+   "value_in_source": 0.02150115929543972,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD noise interp",
+   "value_in_ui_payload": 0.015373053960502148,
+   "source": "eval_metrics.json ood.interp_u0.noise.mean",
+   "value_in_source": 0.015373053960502148,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD noise cnn",
+   "value_in_ui_payload": 0.024295419454574585,
+   "source": "eval_metrics.json ood.cnn_s0.noise.mean",
+   "value_in_source": 0.024295419454574585,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD pulse ensemble",
+   "value_in_ui_payload": 0.06787232309579849,
+   "source": "eval_metrics.json ood.ensemble_mean.pulse.mean",
+   "value_in_source": 0.06787232309579849,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD pulse interp",
+   "value_in_ui_payload": 0.07449862360954285,
+   "source": "eval_metrics.json ood.interp_u0.pulse.mean",
+   "value_in_source": 0.07449862360954285,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD pulse cnn",
+   "value_in_ui_payload": 0.14642269909381866,
+   "source": "eval_metrics.json ood.cnn_s0.pulse.mean",
+   "value_in_source": 0.14642269909381866,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD step ensemble",
+   "value_in_ui_payload": 0.0681140348315239,
+   "source": "eval_metrics.json ood.ensemble_mean.step.mean",
+   "value_in_source": 0.0681140348315239,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD step interp",
+   "value_in_ui_payload": 0.0968022346496582,
+   "source": "eval_metrics.json ood.interp_u0.step.mean",
+   "value_in_source": 0.0968022346496582,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Which model when? / guide table",
+   "claim": "OOD step cnn",
+   "value_in_ui_payload": 0.09407951682806015,
+   "source": "eval_metrics.json ood.cnn_s0.step.mean",
+   "value_in_source": 0.09407951682806015,
+   "equal": true,
+   "render_verified_by": "model guide OOD rows equal /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "IC stress lab / degradation table",
+   "claim": "OOD const_in ensemble mean",
+   "value_in_ui_payload": 0.014299211092293262,
+   "source": "eval_metrics.json ood.ensemble_mean.const_in.mean",
+   "value_in_source": 0.014299211092293262,
+   "equal": true,
+   "render_verified_by": "OOD degradation table equals /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "IC stress lab / degradation table",
+   "claim": "OOD const_high ensemble mean",
+   "value_in_ui_payload": 0.08624719083309174,
+   "source": "eval_metrics.json ood.ensemble_mean.const_high.mean",
+   "value_in_source": 0.08624719083309174,
+   "equal": true,
+   "render_verified_by": "OOD degradation table equals /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "IC stress lab / degradation table",
+   "claim": "OOD smooth ensemble mean",
+   "value_in_ui_payload": 0.02898254059255123,
+   "source": "eval_metrics.json ood.ensemble_mean.smooth.mean",
+   "value_in_source": 0.02898254059255123,
+   "equal": true,
+   "render_verified_by": "OOD degradation table equals /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "IC stress lab / degradation table",
+   "claim": "OOD noise ensemble mean",
+   "value_in_ui_payload": 0.02150115929543972,
+   "source": "eval_metrics.json ood.ensemble_mean.noise.mean",
+   "value_in_source": 0.02150115929543972,
+   "equal": true,
+   "render_verified_by": "OOD degradation table equals /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "IC stress lab / degradation table",
+   "claim": "OOD pulse ensemble mean",
+   "value_in_ui_payload": 0.06787232309579849,
+   "source": "eval_metrics.json ood.ensemble_mean.pulse.mean",
+   "value_in_source": 0.06787232309579849,
+   "equal": true,
+   "render_verified_by": "OOD degradation table equals /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "IC stress lab / degradation table",
+   "claim": "OOD step ensemble mean",
+   "value_in_ui_payload": 0.0681140348315239,
+   "source": "eval_metrics.json ood.ensemble_mean.step.mean",
+   "value_in_source": 0.0681140348315239,
+   "equal": true,
+   "render_verified_by": "OOD degradation table equals /api/meta",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Error cards (held-out test mean)",
+   "claim": "ensemble vs data",
+   "value_in_ui_payload": 0.0012377562234178185,
+   "source": "eval_metrics.json test.ensemble_mean.rel_l2_vs_data.mean",
+   "value_in_source": 0.0012377562234178185,
+   "equal": true,
+   "render_verified_by": "error card: vs dataset + both error cards equally prominent",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Error cards (held-out test mean)",
+   "claim": "ensemble vs accurate solver",
+   "value_in_ui_payload": 0.014413070864975452,
+   "source": "eval_metrics.json test.ensemble_mean.rel_l2_vs_solver.mean",
+   "value_in_source": 0.014413070864975452,
+   "equal": true,
+   "render_verified_by": "error card: vs accurate solver",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Two-errors explanation",
+   "claim": "dataset-vs-solver floor",
+   "value_in_ui_payload": 0.014413172379136086,
+   "source": "eval_metrics.json data_vs_solver_on_test.mean",
+   "value_in_source": 0.014413172379136086,
+   "equal": true,
+   "render_verified_by": "explainer shows dataset tolerance error from results",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Ensemble spread card",
+   "claim": "Spearman in range",
+   "value_in_ui_payload": 0.039105994412465074,
+   "source": "eval_metrics.json trust.spread_vs_error_test.rho",
+   "value_in_source": 0.039105994412465074,
+   "equal": true,
+   "render_verified_by": "initial render",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Ensemble spread card",
+   "claim": "Spearman OOD",
+   "value_in_ui_payload": 0.9678075855689177,
+   "source": "eval_metrics.json trust.spread_vs_error_ood.rho",
+   "value_in_source": 0.9678075855689177,
+   "equal": true,
+   "render_verified_by": "initial render",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Ensemble spread / explainer",
+   "claim": "trust indicator shown?",
+   "value_in_ui_payload": false,
+   "source": "pre-registered rule (build_assets.py) on eval_metrics.json trust",
+   "value_in_source": false,
+   "equal": true,
+   "render_verified_by": "initial render",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Explainer",
+   "claim": "solver vs tight reference (dt=1)",
+   "value_in_ui_payload": 0.000241391607,
+   "source": "solver_validation.json summary.implicit_dt1.0.vs_tight_ref_mean",
+   "value_in_source": 0.000241391607,
+   "equal": true,
+   "render_verified_by": "explainer shows dataset tolerance error from results",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Explainer",
+   "claim": "dataset error vs tight BDF (shown in text)",
+   "value_in_ui_payload": true,
+   "source": "solver_validation.json summary.tight_bdf_vs_data.mean",
+   "value_in_source": true,
+   "equal": true,
+   "render_verified_by": "explainer shows dataset tolerance error from results",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Observables text",
+   "claim": "inflow flux data vs solver (shown in text)",
+   "value_in_ui_payload": true,
+   "source": "derived_outputs.json outputs.inflow_flux_x0.data_vs_solver_rel_l2",
+   "value_in_source": true,
+   "equal": true,
+   "render_verified_by": "initial render",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Timing panel / batch table",
+   "claim": "benchmark rows",
+   "value_in_ui_payload": [
+    {
+     "method": "single FNO",
+     "batch": 1,
+     "ms_per_sample": 7.792799999151612
+    },
+    {
+     "method": "5-FNO ensemble",
+     "batch": 1,
+     "ms_per_sample": 54.83259999891743
+    },
+    {
+     "method": "CNN",
+     "batch": 1,
+     "ms_per_sample": 8.34959999883722
+    },
+    {
+     "method": "interpolation in c",
+     "batch": 1,
+     "ms_per_sample": 0.2636499993968755
+    },
+    {
+     "method": "single FNO",
+     "batch": 10,
+     "ms_per_sample": 2.325849999942875
+    },
+    {
+     "method": "5-FNO ensemble",
+     "batch": 10,
+     "ms_per_sample": 10.566664999896602
+    },
+    {
+     "method": "CNN",
+     "batch": 10,
+     "ms_per_sample": 3.3677800000077696
+    },
+    {
+     "method": "interpolation in c",
+     "batch": 10,
+     "ms_per_sample": 0.31938499996613245
+    },
+    {
+     "method": "single FNO",
+     "batch": 100,
+     "ms_per_sample": 0.8759659999850555
+    },
+    {
+     "method": "5-FNO ensemble",
+     "batch": 100,
+     "ms_per_sample": 3.940472999966005
+    },
+    {
+     "method": "CNN",
+     "batch": 100,
+     "ms_per_sample": 1.8115850000322098
+    },
+    {
+     "method": "interpolation in c",
+     "batch": 100,
+     "ms_per_sample": 0.6079820000013569
+    },
+    {
+     "method": "implicit solver (1024 cells, dt=1.0)",
+     "batch": 1,
+     "ms_per_sample": 914.1499999968801
+    },
+    {
+     "method": "implicit solver (1024 cells, dt=0.5)",
+     "batch": 1,
+     "ms_per_sample": 1245.1983000028122
+    }
+   ],
+   "source": "batch_benchmark.json rows",
+   "value_in_source": [
+    {
+     "method": "single FNO",
+     "batch": 1,
+     "ms_per_sample": 7.792799999151612
+    },
+    {
+     "method": "5-FNO ensemble",
+     "batch": 1,
+     "ms_per_sample": 54.83259999891743
+    },
+    {
+     "method": "CNN",
+     "batch": 1,
+     "ms_per_sample": 8.34959999883722
+    },
+    {
+     "method": "interpolation in c",
+     "batch": 1,
+     "ms_per_sample": 0.2636499993968755
+    },
+    {
+     "method": "single FNO",
+     "batch": 10,
+     "ms_per_sample": 2.325849999942875
+    },
+    {
+     "method": "5-FNO ensemble",
+     "batch": 10,
+     "ms_per_sample": 10.566664999896602
+    },
+    {
+     "method": "CNN",
+     "batch": 10,
+     "ms_per_sample": 3.3677800000077696
+    },
+    {
+     "method": "interpolation in c",
+     "batch": 10,
+     "ms_per_sample": 0.31938499996613245
+    },
+    {
+     "method": "single FNO",
+     "batch": 100,
+     "ms_per_sample": 0.8759659999850555
+    },
+    {
+     "method": "5-FNO ensemble",
+     "batch": 100,
+     "ms_per_sample": 3.940472999966005
+    },
+    {
+     "method": "CNN",
+     "batch": 100,
+     "ms_per_sample": 1.8115850000322098
+    },
+    {
+     "method": "interpolation in c",
+     "batch": 100,
+     "ms_per_sample": 0.6079820000013569
+    },
+    {
+     "method": "implicit solver (1024 cells, dt=1.0)",
+     "batch": 1,
+     "ms_per_sample": 914.1499999968801
+    },
+    {
+     "method": "implicit solver (1024 cells, dt=0.5)",
+     "batch": 1,
+     "ms_per_sample": 1245.1983000028122
+    }
+   ],
+   "equal": true,
+   "render_verified_by": "batch benchmark table rendered",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Footer",
+   "claim": "padding 3-seed test means",
+   "value_in_ui_payload": [
+    0.001291990474,
+    0.001348526101
+   ],
+   "source": "padding_3seeds.json configs.*.mean_std.test_rel_l2.mean",
+   "value_in_source": [
+    0.001291990474,
+    0.001348526101
+   ],
+   "equal": true,
+   "render_verified_by": "initial render",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Physics-shift lab",
+   "claim": "surrogate unchanged when physics changes",
+   "value_in_ui_payload": true,
+   "source": "live: /api/compare at two D values",
+   "value_in_source": true,
+   "equal": true,
+   "render_verified_by": "surrogate unchanged by physics shift + error grows with physics shift",
+   "render_check_passed": true
+  },
+  {
+   "ui_element": "Live cards",
+   "claim": "error / timing numbers equal an independent API call",
+   "value_in_ui_payload": true,
+   "source": "live: /api/compare",
+   "value_in_source": true,
+   "equal": true,
+   "render_verified_by": "error card: vs accurate solver + error card: vs dataset + card: dataset vs accurate + component timing cards present",
+   "render_check_passed": true
+  }
+ ]
+}
