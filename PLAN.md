@@ -3,20 +3,31 @@
 Start: 2026-11-14 08:55:59 +05:30 (recorded with Get-Date at the first prompt).
 Hard limit: 72 h after start, but the submission deadline of 15 Nov 2026 binds first.
 The deadline's time zone is unconfirmed, so I assume the earliest possible reading:
-end of 15 Nov in UTC+14 = **2026-11-15 15:29 IST**. That leaves about 30.5 h in total.
+end of 15 Nov in UTC+14 = **2026-11-15 15:29 IST**.
 
-## Phase 0: setup
-- repo, venv, .gitignore, PLAN.md, DECISIONS.md
-- PDEBench cloned (shallow, gitignored) as a read-only reference for constants and URLs
-- data download in the background (3.92 GB, MD5 checked against PDEBench's url csv)
+## What the data turned out to be (it overrides the original brief; see DECISIONS.md 7, 9, 12)
+- The IC is a spatially constant level c ∈ (0, 0.2), not noise, so the problem is a one-parameter family c → u(x, t).
+- 101 stored times (dt = 5 s), 1024 cells, 10,000 samples.
+- u(x≈1) ≈ 0 for t > ~5 s, so a breakthrough curve at x = 1 carries no information.
+- The dataset carries ~1.44% relative-L2 RK45 tolerance error against the accurately solved equations.
 
-## Phase 1: data, solver, models, evaluation (stop after this phase)
-1. Inspect the HDF5 with h5py (layout, shapes, dtype, grids, IC statistics); plot a sample.
-2. Cache: up to 4000 samples at 256 x 101 (strided) float32, split by sample index (seeded), plus about 100 test samples at 1024.
-3. Reference solver (implicit, Newton, tridiagonal), validated against held-out trajectories before it is used.
-4. Measure CPU vs MX450 epoch time; then train the CNN baseline, the FNO (padding on/off) and a 5-seed FNO ensemble.
-5. Evaluation: rel-L2 statistics, error vs x/t, boundary error, mass/flux, PDE residual, timing,
-   OOD set from the solver, IC-vs-BC sensitivity, Spearman(spread or residual, error).
-6. Results JSON and figures in `results/`, small checkpoints in `checkpoints/`.
+## Phase 0: done
+Repo, venv, .gitignore, PDEBench reference clone (gitignored), MD5-verified download.
 
-## Phase 2 (after the user's go-ahead): FastAPI + static frontend + Physics-shift lab.
+## Phase 1: data, solver, models, evaluation
+1. [done] HDF5 inspection, cache (split by key index), solver validated (8e-5 vs tight BDF at dt=0.5).
+2. [done] CNN baseline (killed stage kept its finished checkpoint).
+3. [running] Sequential trainer: FNO pad0, FNO pad25, 4 more ensemble seeds, data-efficiency sweep.
+4. Evaluation with error vs the dataset AND vs the accurate solver, plus the trivial baselines
+   (interpolation in c, mean trajectory), OOD, trust, IC-vs-BC sensitivity, timing.
+
+## Phase 2: application (no deployment yet)
+- FastAPI: /api/health, /api/meta, /api/predict, /api/solve, /api/compare; static vanilla JS + Plotly frontend.
+- The main control is the level c over the training range, with an OOD warning outside it.
+- An IC "stress lab" (noise, pulse, smooth, step, CSV) presented as out of distribution, with the measured degradation.
+- Outputs chosen from what the data supports (concentration at a selectable x, front position, inflow/uptake at x=0)
+  instead of the x=1 breakthrough curve.
+- Three curves where relevant: surrogate, dataset-style solution (RK45, default tolerance, like the generator),
+  and the accurately solved solution, with an explainer of the ~1.4% gap.
+- Physics-shift lab and a trust indicator, each only if the evidence supports it.
+- pytest API tests; UI verification by loading it in a browser (screenshots, console errors, numbers vs API).

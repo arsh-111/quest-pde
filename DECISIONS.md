@@ -31,3 +31,26 @@ Format: decision | alternatives | evidence.
    - Metrics are reported against both the data and the solver.
 10. **Reference solver dt = 0.5 for ground truth (8e-5 rel L2 vs tight BDF, 0.64 s per 1024-cell run); dt = 1 for interactive use (2.4e-4, 0.33 s).**
 11. **Train on the GPU:** measured FNO 7.5 s/epoch on CUDA vs 33.8 s on CPU; CNN 5.7 vs 58.8 s (`results/device_benchmark.json`).
+12. **The brief's premise was wrong on three points; the evidence wins (the user confirmed this after the Phase-1 checkpoint).**
+
+    | Brief assumed | Data / generator shows | Evidence |
+    |---|---|---|
+    | IC = random noise in (0, 0.2) | IC = spatially constant level c ~ U(0, 0.2); per-sample spatial std ≤ 3e-8 | `results/data_inspection.json`, `sim_diff_sorp.py` (`u0 = ones * uniform(0, 0.2)`) |
+    | 501 time steps plus a 101-step version | only 101 stored times (dt = 5 s), although the config says tdim=501 | `results/data_inspection.json` |
+    | a useful breakthrough curve at x = 1 | the right BC u = D·u_x (D = 5e-4) pins u(x≈1) ≈ 0; the last cell falls below ~0.005 within the first output step and stays near 0.001 | `figures/sample_trajectories.png` |
+
+    Consequences:
+    - The learning problem is a one-parameter family c → u(x, t).
+    - Strong trivial baselines (interpolation in c, the mean trajectory) belong in every table.
+    - Noise, pulse and smooth ICs are out of distribution by construction.
+    - The product's main control becomes the level c, and the outputs become ones the data supports (see the Phase 2 decisions).
+13. **Two kinds of error are always reported separately:**
+    - error against the dataset (what the surrogate was trained on);
+    - error against the accurately solved equations (the implicit solver at dt = 0.5, 8e-5 from tight BDF).
+
+    The two differ by the dataset's own ~1.44% RK45 tolerance error (decision 9).
+14. **Training runs strictly sequentially in one process (`qpde/train_many.py`) with the data loaded once onto the GPU** | separate processes per run | the first stage-1 run was killed by Claude Code under system memory pressure (Brave was using ~4 GB; 3.2 GB physical free at restart).
+    - The new trainer peaks at ~1.0 GB RSS with the 0.35 GB of data on the GPU.
+    - It logs memory before each run, saves resumable state about every 1000 steps, and aborts (no retry) below 1.5 GB of available RAM.
+    - The finished CNN baseline (`cnn_s0`, best val 1.38e-3) from the killed stage is kept.
+15. **Data-efficiency sweep** | none | because the input is a scalar, few samples may suffice. FNO, seed 0, n_train ∈ {25 … 3200}, fixed budget of 6000 optimiser steps for every size, so only the data size changes.
