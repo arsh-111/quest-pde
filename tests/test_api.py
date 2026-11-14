@@ -95,3 +95,45 @@ def test_custom_csv_ic_and_validation_errors():
 def test_index_served():
     r = client.get("/")
     assert r.status_code == 200 and "Sorption Surrogate Lab" in r.text
+
+
+def test_interp_model_and_component_timings():
+    r = client.post("/api/predict", json={"ic": {"kind": "constant", "level": 0.1}, "model": "interp"}).json()
+    u = np.array(r["u"])
+    assert u.shape == (101, 256) and np.allclose(u[0], 0.1, atol=1e-3)
+    c = client.post("/api/compare", json={"ic": {"kind": "constant", "level": 0.1}, "model": "ensemble"}).json()
+    assert set(c["component_ms"]) == {"surrogate", "interp", "solver"}
+    assert c["component_ms"]["solver"] > c["component_ms"]["surrogate"]
+
+
+def test_interp_flags_clamping_outside_table():
+    c = client.post("/api/compare", json={"ic": {"kind": "constant", "level": 0.35}, "model": "interp"}).json()
+    assert any("clamps" in s for s in c["ood"]["reasons"])
+
+
+def test_gzip_and_rounding():
+    r = client.post("/api/compare", json={"ic": {"kind": "constant", "level": 0.1}}, headers={"Accept-Encoding": "gzip"})
+    assert r.headers.get("content-encoding") == "gzip"
+    vals = r.json()["solver"]["u"][50][:50]
+    assert all(abs(v * 1e5 - round(v * 1e5)) < 1e-6 for v in vals)
+
+
+def test_live_benchmark_endpoint():
+    rows = client.post("/api/benchmark").json()["rows"]
+    methods = {row["method"] for row in rows}
+    assert {"fno", "ensemble", "cnn", "interp"} <= methods and any(m.startswith("solver") for m in methods)
+
+
+def test_plotly_is_served_locally():
+    r = client.get("/static/vendor/plotly-cartesian-2.35.2.min.js")
+    assert r.status_code == 200 and "plotly.js" in r.text[:200]
+    assert "cdn." not in client.get("/").text
+
+
+def test_model_guide_numbers_come_from_result_files():
+    g = client.get("/api/meta").json()["evaluation"]["model_guide"]
+    ev = json.loads((ROOT / "results" / "eval_metrics.json").read_text())
+    assert g["in_range"]["interp_full_vs_data"] == ev["test"]["interp_u0"]["rel_l2_vs_data"]["mean"]
+    hi = next(r for r in g["ood_rows"] if r["family"] == "const_high")
+    assert hi["ensemble"] == ev["ood"]["ensemble_mean"]["const_high"]["mean"]
+    assert hi["interp"] == ev["ood"]["interp_u0"]["const_high"]["mean"]

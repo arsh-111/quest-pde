@@ -95,7 +95,7 @@
    "p": 5.3643484419094555e-28,
    "n": 46
   },
-  "card_note": "not an error estimate; above 2.5e-04 = unfamiliar input",
+  "card_note": "informational only; Spearman with true error: 0.04 in range, 0.97 on OOD",
   "spread_html": "<b>Ensemble spread</b> is shown as a raw number, not as a trust score. In-distribution it does not rank the true error (Spearman 0.04, p = 0.44); on the OOD set it does (0.97). Above 2.5e-04 (99th percentile of test spread) it flagged const_in 0%, const_high 100%, smooth 100%, noise 100%, pulse 100%, step 100% of the held-out OOD set, so read a large spread as 'unlike the training data', not as an error size.",
   "flag_threshold": 0.00024553079856559634
  },
@@ -128,5 +128,75 @@
  },
  "explainer_html": "<b>Accurate solver</b> (black): the PDEBench equations solved with an implicit BDF2/Newton scheme on the same 1024-cell grid; it agrees with a tight-tolerance reference to 2.4e-04 (relative L2) at the step used here. <b>Dataset-style</b> (orange): interpolation between stored PDEBench trajectories. The generator integrated with SciPy RK45 at default tolerances, which leaves a 1.45% relative-L2 time-integration error that grows with t. <b>Surrogate</b> (blue): trained on the dataset, so it reproduces the dataset (0.12% mean on held-out test samples) and inherits its offset from the accurate solution (1.44%). Shown only for spatially constant ICs at the training physics.",
  "observables_html": "The breakthrough curve at x = 1 is not shown: the outflow boundary u = D\u00b7\u2202u/\u2202x with D = 5e-4 keeps u(1) \u2248 0, so it is flat in every sample. Instead: the concentration at a chosen x, the position of the u = 0.5 front, and the total amount that has entered the column (uptake). The inflow flux at x = 0 is not shown either: it depends on 1 \u2212 u in the first cell, and even the PDEBench data differs from the accurate solver there by 22.54% (the surrogate: 19.63% vs data). Uptake is its time integral and is robust: ensemble vs data 0.11%.",
- "footer_html": "Ensemble: 5 \u00d7 FNO (fno_pad0), trained on 3,200 PDEBench samples (keys 0000\u20133199); test keys 3600\u20133999. All numbers on this page come from results/*.json produced in this project."
+ "footer_html": "Ensemble: 5 \u00d7 FNO (fno_pad0), trained on 3,200 PDEBench samples (keys 0000\u20133199); test keys 3600\u20133999. All numbers on this page come from results/*.json produced in this project.",
+ "model_guide": {
+  "in_range": {
+   "ensemble_vs_data": 0.0012377562234178185,
+   "fno_vs_data": 0.0012711557792499661,
+   "cnn_vs_data": 0.001386195421218872,
+   "interp_full_vs_data": 8.767031249590218e-05,
+   "interp_app_table_vs_data": 0.0005080152186565101,
+   "app_table_levels": 256,
+   "interp_full_levels": 3200
+  },
+  "ood_rows": [
+   {
+    "family": "const_in",
+    "ensemble": 0.014299211092293262,
+    "interp": 0.014316380023956299,
+    "cnn": 0.014322953298687935
+   },
+   {
+    "family": "const_high",
+    "ensemble": 0.08624719083309174,
+    "interp": 0.3728988468647003,
+    "cnn": 0.0740937665104866
+   },
+   {
+    "family": "smooth",
+    "ensemble": 0.02898254059255123,
+    "interp": 0.03427712991833687,
+    "cnn": 0.038359951227903366
+   },
+   {
+    "family": "noise",
+    "ensemble": 0.02150115929543972,
+    "interp": 0.015373053960502148,
+    "cnn": 0.024295419454574585
+   },
+   {
+    "family": "pulse",
+    "ensemble": 0.06787232309579849,
+    "interp": 0.07449862360954285,
+    "cnn": 0.14642269909381866
+   },
+   {
+    "family": "step",
+    "ensemble": 0.0681140348315239,
+    "interp": 0.0968022346496582,
+    "cnn": 0.09407951682806015
+   }
+  ]
+ },
+ "model_guide_html": "<b>In range (flat IC, 0 &lt; c &lt; 0.2): interpolation wins.</b> Interpolating stored trajectories in c is 0.01% from held-out data with all 3,200 training trajectories (0.05% with the 256-level table this app serves); the FNO ensemble is 0.12%. <b>Out of range or non-flat ICs: the FNO helps.</b> For c &gt; 0.2 the ensemble is 8.62% from the accurate solver vs 37.29% for interpolation, which can only clamp to the edge of its table. For non-flat ICs interpolation sees only the mean level (see the table).",
+ "two_errors_html": "Two errors, always shown together: <b>vs dataset</b> is how well the model reproduces PDEBench's stored trajectories (what it was trained on); <b>vs accurate solver</b> is the error against the equations solved accurately. They differ by the dataset's own RK45 tolerance error (~1.44%).",
+ "test_two_errors": {
+  "interp_u0": {
+   "vs_data": 8.767031249590218e-05,
+   "vs_solver": 0.01441171858459711
+  },
+  "ensemble_mean": {
+   "vs_data": 0.0012377562234178185,
+   "vs_solver": 0.014413070864975452
+  },
+  "fno_pad0_s0": {
+   "vs_data": 0.0012711557792499661,
+   "vs_solver": 0.014403163455426693
+  },
+  "cnn_s0": {
+   "vs_data": 0.001386195421218872,
+   "vs_solver": 0.014405181631445885
+  }
+ },
+ "padding_note": "Padding comparison: single seed (pad0 vs pad 0.25)."
 }

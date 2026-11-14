@@ -84,6 +84,51 @@ summary = {
     "footer_html": (f"Ensemble: 5 × FNO ({pc['chosen']}), trained on 3,200 PDEBench samples (keys 0000–3199); "
                     "test keys 3600–3999. All numbers on this page come from results/*.json produced in this project."),
 }
+# ---- where each model helps (A1): in-range test and OOD families, measured in results/eval_metrics.json
+O = ev["ood"]
+lk = dv["dataset_lookup_table"]
+summary["model_guide"] = {
+    "in_range": {
+        "ensemble_vs_data": T[ens]["rel_l2_vs_data"]["mean"], "fno_vs_data": T["fno_pad0_s0"]["rel_l2_vs_data"]["mean"],
+        "cnn_vs_data": T["cnn_s0"]["rel_l2_vs_data"]["mean"],
+        "interp_full_vs_data": T["interp_u0"]["rel_l2_vs_data"]["mean"],
+        "interp_app_table_vs_data": lk[str(K)]["mean_rel_l2_vs_data"], "app_table_levels": K,
+        "interp_full_levels": json.loads((ROOT / "data" / "cache" / "meta.json").read_text())["splits"]["train"]["n"],
+    },
+    "ood_rows": [{"family": c, "ensemble": O[ens][c]["mean"], "interp": O["interp_u0"][c]["mean"],
+                  "cnn": O["cnn_s0"][c]["mean"]} for c in cats_order if c in O[ens]],
+}
+g = summary["model_guide"]
+hi = next(r for r in g["ood_rows"] if r["family"] == "const_high")
+summary["model_guide_html"] = (
+    f"<b>In range (flat IC, 0 &lt; c &lt; 0.2): interpolation wins.</b> Interpolating stored trajectories in c is "
+    f"{pct(g['in_range']['interp_full_vs_data'])} from held-out data with all {g["in_range"]["interp_full_levels"]:,} training trajectories "
+    f"({pct(g['in_range']['interp_app_table_vs_data'])} with the {K}-level table this app serves); the FNO ensemble is "
+    f"{pct(g['in_range']['ensemble_vs_data'])}. "
+    f"<b>Out of range or non-flat ICs: the FNO helps.</b> For c &gt; 0.2 the ensemble is {pct(hi['ensemble'])} from the "
+    f"accurate solver vs {pct(hi['interp'])} for interpolation, which can only clamp to the edge of its table. "
+    "For non-flat ICs interpolation sees only the mean level (see the table).")
+summary["two_errors_html"] = (
+    "Two errors, always shown together: <b>vs dataset</b> is how well the model reproduces PDEBench's stored "
+    "trajectories (what it was trained on); <b>vs accurate solver</b> is the error against the equations solved "
+    f"accurately. They differ by the dataset's own RK45 tolerance error (~{pct(floor)}).")
+summary["test_two_errors"] = {n: {"vs_data": T[n]["rel_l2_vs_data"]["mean"], "vs_solver": T[n]["rel_l2_vs_solver"]["mean"]}
+                              for n in ["interp_u0", ens, "fno_pad0_s0", "cnn_s0"]}
+bb = R / "batch_benchmark.json"
+if bb.exists():
+    summary["batch_benchmark"] = json.loads(bb.read_text())
+pd = R / "padding_3seeds.json"
+if pd.exists():
+    P = json.loads(pd.read_text())["configs"]
+    summary["padding"] = {k: v["mean_std"] for k, v in P.items()}
+    summary["padding_note"] = (
+        f"Padding (3 seeds each): test rel L2 pad0 {pct(P['fno_pad0']['mean_std']['test_rel_l2']['mean'])} "
+        f"± {pct(P['fno_pad0']['mean_std']['test_rel_l2']['std'])}, pad 0.25 "
+        f"{pct(P['fno_pad25']['mean_std']['test_rel_l2']['mean'])} ± {pct(P['fno_pad25']['mean_std']['test_rel_l2']['std'])}.")
+else:
+    summary["padding_note"] = "Padding comparison: single seed (pad0 vs pad 0.25)."
+summary["trust"]["card_note"] = (f"informational only; Spearman with true error: {sp_t['rho']:.2f} in range, "
+                                 f"{sp_o['rho']:.2f} on OOD")
 (A / "summary.json").write_text(json.dumps(summary, indent=1))
 print(json.dumps({k: summary[k] for k in ["test", "trust"]}, indent=1))
 print("dataset table", K, "levels", f"{(A / 'dataset_table.npz').stat().st_size / 2**20:.1f} MB")

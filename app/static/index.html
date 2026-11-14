@@ -6,7 +6,7 @@
 <title>Sorption Surrogate Lab</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%232563eb'/%3E%3Cpath d='M2 4 Q6 4 8 9 T14 13' stroke='white' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/style.css">
-<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="/static/vendor/plotly-cartesian-2.35.2.min.js"></script>
 </head>
 <body>
 <header>
@@ -70,6 +70,7 @@
       <option value="ensemble">FNO ensemble (5 seeds)</option>
       <option value="fno">single FNO</option>
       <option value="cnn">CNN baseline</option>
+      <option value="interp">interpolation in c (no learning)</option>
     </select>
   </label>
   <label>Display resolution
@@ -83,7 +84,15 @@
 
 <section id="results">
   <div id="banner" class="banner hidden"></div>
+  <div id="errors" class="errors"></div>
+  <p id="two-errors" class="explain"></p>
   <div id="cards" class="cards"></div>
+
+  <div class="panel">
+    <h2>Which model when?</h2>
+    <p id="guide" class="explain"></p>
+    <div id="guide-table"></div>
+  </div>
 
   <div class="panel">
     <h2>Space–time view</h2>
@@ -109,6 +118,14 @@
   <div class="panel hidden" id="sweep-panel">
     <h2>Physics shift: surrogate error vs one parameter</h2>
     <div id="sweep" class="plot tall"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Timing (CPU)</h2>
+    <div id="timing-live" class="explain"></div>
+    <div id="bench-table"></div>
+    <button id="run-bench" class="secondary">Run live benchmark on this server</button>
+    <div id="bench-live"></div>
   </div>
 
   <div class="panel">

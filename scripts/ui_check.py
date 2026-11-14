@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 URL = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8765"
 OUT = ROOT / "figures" / "ui"
 OUT.mkdir(parents=True, exist_ok=True)
-checks, console, errors, failed = [], [], [], []
+checks, console, errors, failed, requests = [], [], [], [], []
 
 
 def check(name, ok, detail=""):
@@ -68,6 +68,7 @@ with sync_playwright() as pw:
     page.on("console", lambda m: console.append({"type": m.type, "text": m.text}))
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.on("requestfailed", lambda r: failed.append(f"{r.url} {r.failure}"))
+    page.on("request", lambda r: requests.append(r.url))
     page.add_init_script("""
       const _f = window.fetch;
       window.fetch = async (...a) => { const r = await _f(...a);
@@ -82,13 +83,19 @@ with sync_playwright() as pw:
     req = page.evaluate("() => window.__app.lastReq")
     ref = api("/api/compare", req)
     shown = dict(cards(page))
+    errs = dict(page.evaluate("() => Array.from(document.querySelectorAll('.err-card')).map(c => "
+                              "[c.querySelector('.k').textContent, c.querySelector('.v').textContent])"))
     m = ref["metrics"]
-    check("card: surrogate vs solver", shown.get("Surrogate vs accurate solver") == pct(m["rel_l2_surrogate_vs_solver"]),
-          f"{shown.get('Surrogate vs accurate solver')} vs api {pct(m['rel_l2_surrogate_vs_solver'])}")
-    check("card: surrogate vs dataset-style", shown.get("Surrogate vs dataset-style") == pct(m["rel_l2_surrogate_vs_dataset_style"]),
-          f"{shown.get('Surrogate vs dataset-style')} vs api {pct(m['rel_l2_surrogate_vs_dataset_style'])}")
-    check("card: dataset-style vs accurate", shown.get("Dataset-style vs accurate") == pct(m["rel_l2_dataset_style_vs_solver"]),
-          f"{shown.get('Dataset-style vs accurate')} vs api {pct(m['rel_l2_dataset_style_vs_solver'])}")
+    check("error card: vs accurate solver", errs.get("Error vs accurate solver") == pct(m["rel_l2_surrogate_vs_solver"]),
+          f"{errs.get('Error vs accurate solver')} vs api {pct(m['rel_l2_surrogate_vs_solver'])}")
+    check("error card: vs dataset", errs.get("Error vs dataset") == pct(m["rel_l2_surrogate_vs_dataset_style"]),
+          f"{errs.get('Error vs dataset')} vs api {pct(m['rel_l2_surrogate_vs_dataset_style'])}")
+    check("both error cards equally prominent", page.evaluate(
+        "() => { const v = Array.from(document.querySelectorAll('.err-card .v')).map(e => getComputedStyle(e).fontSize); "
+        "return v.length === 2 && v[0] === v[1]; }"))
+    check("card: dataset vs accurate", shown.get("Dataset vs accurate") == pct(m["rel_l2_dataset_style_vs_solver"]),
+          f"{shown.get('Dataset vs accurate')} vs api {pct(m['rel_l2_dataset_style_vs_solver'])}")
+    check("component timing cards present", all(k in shown for k in ("Surrogate", "Interpolation", "Solver")))
     check("no OOD banner at c=0.1", page.evaluate("() => document.getElementById('banner').classList.contains('hidden')"))
     n_traces = page.evaluate("() => document.getElementById('profile').data.length")
     check("profile shows three curves in distribution", n_traces == 3, f"{n_traces} traces")
@@ -98,6 +105,28 @@ with sync_playwright() as pw:
           f"{100 * json.loads((ROOT / 'results' / 'solver_validation.json').read_text())['summary']['tight_bdf_vs_data']['mean']:.2f}%" in expl)
     heat = page.evaluate("() => ['hm-sur','hm-sol','hm-err'].map(i => document.getElementById(i).data[0].z.length)")
     check("heatmaps rendered with 101 time rows", heat == [101, 101, 101], str(heat))
+
+    # --- model guide and benchmark tables equal /api/meta
+    g = meta["evaluation"]["model_guide"]
+    grows = page.evaluate("() => Array.from(document.querySelectorAll('#guide-table tr')).slice(1).map(r => "
+                          "Array.from(r.cells).map(c => c.textContent))")
+    want_g = [[f"OOD: {r['family']}", pct(r["ensemble"]), pct(r["interp"]), pct(r["cnn"]), "accurate solver"] for r in g["ood_rows"]]
+    check("model guide OOD rows equal /api/meta", grows[1:] == want_g, f"{len(grows)} rows")
+    check("model guide in-range row shows interpolation number", pct(g["in_range"]["interp_full_vs_data"]) in grows[0][2])
+    check("batch benchmark table rendered", page.evaluate("() => document.querySelectorAll('#bench-table tr').length") ==
+          1 + len({r["method"] for r in meta["evaluation"]["batch_benchmark"]["rows"]}))
+    page.click("#run-bench")
+    page.wait_for_function("() => window.__app.lastBench && document.getElementById('run-bench').textContent.startsWith('Run')", timeout=60000)
+    check("live benchmark rendered", page.evaluate("() => document.querySelectorAll('#bench-live tr').length") > 4)
+
+    # --- interpolation model
+    page.evaluate("() => window.__prevStamp = window.__app.lastStamp")
+    page.select_option("#model", "interp")
+    check("render with interpolation model", wait_result(page, prev_id=1) and page.evaluate("() => window.__app.last.model") == "interp")
+    page.screenshot(path=str(OUT / "07_interp_model.png"), full_page=False)
+    page.evaluate("() => window.__prevStamp = window.__app.lastStamp")
+    page.select_option("#model", "ensemble")
+    wait_result(page, prev_id=1)
 
     # --- profile time slider
     page.evaluate("() => { const e = document.getElementById('ts'); e.value = 60; e.dispatchEvent(new Event('input')); }")
@@ -184,6 +213,9 @@ with sync_playwright() as pw:
     browser.close()
 
 err_console = [c for c in console if c["type"] in ("error", "warning")]
+host = URL.split("//", 1)[1].split("/", 1)[0]
+external = sorted({r for r in requests if host not in r and not r.startswith("data:")})
+check("no requests to other hosts (Plotly served locally)", not external, "; ".join(external)[:300])
 # the app aborts superseded /api/compare calls on purpose (AbortController); count those separately
 aborted = [f for f in failed if "/api/compare" in f and "ERR_ABORTED" in f]
 real_failed = [f for f in failed if f not in aborted]

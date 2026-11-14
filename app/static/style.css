@@ -63,3 +63,12 @@ footer { color: var(--muted); font-size: 12px; padding: 4px 20px 20px; }
   .heatmaps, .obs { grid-template-columns: 1fr; }
   header { padding: 12px 16px; }
 }
+
+.errors { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.err-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.err-card .k { color: var(--muted); font-size: 13px; }
+.err-card .v { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.err-card .n { color: var(--muted); font-size: 12px; }
+#two-errors { margin: 6px 2px 12px; }
+td.num, th.num { text-align: right; }
+@media (max-width: 900px) { .errors { grid-template-columns: 1fr; } }

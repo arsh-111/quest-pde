@@ -47,14 +47,13 @@ def _load(name: str):
 
 class Service:
     def __init__(self):
-        pc = json.loads((RESULTS / "padding_choice.json").read_text())
-        self.ens_prefix = pc["chosen"]
+        self.summary = json.loads((ASSETS / "summary.json").read_text())  # built by scripts/build_assets.py
+        self.ens_prefix = self.summary["ensemble"]
         self.ensemble = [_load(f"{self.ens_prefix}_s{i}")[0] for i in range(5)]
         self.fno, self.fno_cfg = _load(f"{self.ens_prefix}_s0")
         self.cnn, self.cnn_cfg = _load("cnn_s0")
         tab = np.load(ASSETS / "dataset_table.npz")
         self.table_c, self.table_u = tab["c"], tab["u"]  # dataset trajectories sorted by c, (K,), (K, 101, 256)
-        self.summary = json.loads((ASSETS / "summary.json").read_text())  # built by scripts/build_assets.py
 
     # ------------------------------------------------------------------ inputs
     @staticmethod
@@ -87,7 +86,27 @@ class Service:
         return {"ood": bool(reasons), "reasons": reasons, "ic_level": lvl, "ic_std": std}
 
     # ------------------------------------------------------------------ models
+    def _table_interp(self, level: float) -> tuple[np.ndarray, bool]:
+        """Linear interpolation in c between stored dataset trajectories (256-point grid). Clamps outside the table."""
+        lv = self.table_c
+        clamped = not (lv[0] <= level <= lv[-1])
+        c = float(np.clip(level, lv[0], lv[-1]))
+        j = int(np.clip(np.searchsorted(lv, c), 1, len(lv) - 1))
+        w = 0.0 if lv[j] == lv[j - 1] else float(np.clip((c - lv[j - 1]) / (lv[j] - lv[j - 1]), 0, 1))
+        return ((1 - w) * self.table_u[j - 1] + w * self.table_u[j]).astype(np.float64), clamped
+
+    def interp(self, u0_fine: np.ndarray, nx: int) -> dict:
+        """The interpolation baseline: sees only the mean IC level; 1024 output is linear upsampling in x."""
+        t0 = time.perf_counter()
+        u, clamped = self._table_interp(float(u0_fine.mean()))
+        if nx != 256:
+            xs, xt = x_grid(256), x_grid(nx)
+            u = np.stack([np.interp(xt, xs, row) for row in u])
+        return {"u": u, "x": x_grid(nx), "ms": (time.perf_counter() - t0) * 1e3, "clamped": clamped}
+
     def predict(self, u0_fine: np.ndarray, model: str, nx: int) -> dict:
+        if model == "interp":
+            return self.interp(u0_fine, nx)
         x = x_grid(nx)
         u0 = u0_fine[:: NX_FINE // nx][None]
         X = make_inputs(u0, x)
@@ -122,11 +141,8 @@ class Service:
         """Interpolate real PDEBench trajectories in c (constant ICs, default physics only); 256-point grid only."""
         if nx != 256 or not (self.table_c[0] <= level <= self.table_c[-1]):
             return None
-        j = int(np.clip(np.searchsorted(self.table_c, level), 1, len(self.table_c) - 1))
-        c0, c1 = self.table_c[j - 1], self.table_c[j]
-        w = 0.0 if c1 == c0 else float(np.clip((level - c0) / (c1 - c0), 0, 1))
-        u = (1 - w) * self.table_u[j - 1] + w * self.table_u[j]
-        return {"u": u.astype(np.float64), "x": x_grid(256), "ms": 0.0}
+        u, _ = self._table_interp(level)
+        return {"u": u, "x": x_grid(256), "ms": 0.0}
 
 
 def outputs(u: np.ndarray, x: np.ndarray, x_query: float, p: PhysParams) -> dict:
@@ -139,7 +155,7 @@ def _clean(a):
     return [None if not np.isfinite(v) else round(float(v), 7) for v in a.ravel()] if a.ndim else float(a)
 
 
-def arr(a, nd=6):
+def arr(a, nd=5):  # 1e-5 resolution: far below every displayed error (smallest: interp vs data ~5e-4 relative)
     return np.round(np.asarray(a, dtype=np.float64), nd).tolist()
 
 

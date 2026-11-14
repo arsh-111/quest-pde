@@ -128,18 +128,35 @@ function render(r) {
   } else banner(null);
 
   const m = r.metrics, cards = [];
-  cards.push(card("Surrogate vs accurate solver", pct(m.rel_l2_surrogate_vs_solver), "relative L2 over t>0"));
-  if (m.rel_l2_surrogate_vs_dataset_style !== undefined) {
-    cards.push(card("Surrogate vs dataset-style", pct(m.rel_l2_surrogate_vs_dataset_style), "what it was trained to match"));
-    cards.push(card("Dataset-style vs accurate", pct(m.rel_l2_dataset_style_vs_solver), "PDEBench generator tolerance"));
-  }
-  cards.push(card("Max abs error", fmt(m.max_abs_surrogate_vs_solver), "surrogate vs solver"));
-  cards.push(card("Surrogate time", r.surrogate.timing_ms.toFixed(1) + " ms", r.model + ", CPU"));
-  cards.push(card("Solver time", r.solver.timing_ms.toFixed(0) + " ms", "implicit, 1024 cells, CPU"));
+  const tk = { ensemble: "ensemble_mean", fno: "fno_pad0_s0", cnn: "cnn_s0", interp: "interp_u0" }[r.model];
+  const held = (ev.test_two_errors || {})[tk] || {};
+  const g = (ev.model_guide || {}).in_range || {};
+  const heldData = r.model === "interp" ? g.interp_app_table_vs_data : held.vs_data;
+  const errCard = (k, v, n) => `<div class="err-card"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`;
+  $("errors").innerHTML =
+    (r.model === "interp"
+      ? errCard("Error vs dataset", pct(heldData), `held-out test mean (${g.app_table_levels}-level table); for this input the ` +
+          "dataset-style curve is this interpolation itself")
+      : errCard("Error vs dataset", m.rel_l2_surrogate_vs_dataset_style !== undefined ? pct(m.rel_l2_surrogate_vs_dataset_style) : "n/a",
+          m.rel_l2_surrogate_vs_dataset_style !== undefined ? `this input · held-out test mean ${pct(heldData)}`
+            : "no stored PDEBench trajectory exists for this input")) +
+    errCard("Error vs accurate solver", pct(m.rel_l2_surrogate_vs_solver),
+      `this input · held-out test mean ${pct(held.vs_solver)}`);
+  $("two-errors").innerHTML = ev.two_errors_html || "";
+  if (m.rel_l2_dataset_style_vs_solver !== undefined)
+    cards.push(card("Dataset vs accurate", pct(m.rel_l2_dataset_style_vs_solver), "PDEBench generator tolerance"));
+  cards.push(card("Max abs error", fmt(m.max_abs_surrogate_vs_solver), "model vs solver"));
+  const cm = r.component_ms || {};
+  if (r.model !== "interp") cards.push(card("Surrogate", (cm.surrogate ?? r.surrogate.timing_ms).toFixed(1) + " ms", r.model + ", CPU, this call"));
+  cards.push(card("Interpolation", (cm.interp ?? 0).toFixed(2) + " ms", "CPU, this call"));
+  cards.push(card("Solver", (cm.solver ?? r.solver.timing_ms).toFixed(0) + " ms", "implicit, 1024 cells, this call"));
   if (r.surrogate.spread_mean !== undefined) {
     const tr = ev.trust || {};
-    cards.push(card("Ensemble spread", fmt(r.surrogate.spread_mean), tr.card_note || "raw value; see caveat"));
+    cards.push(card("Ensemble spread", fmt(r.surrogate.spread_mean), tr.card_note || ""));
   }
+  $("timing-live").innerHTML = `This call: model ${r.model === "interp" ? "–" : (cm.surrogate ?? 0).toFixed(1) + " ms"}, ` +
+    `interpolation ${(cm.interp ?? 0).toFixed(2)} ms, solver ${(cm.solver ?? 0).toFixed(0)} ms; server total ${r.total_ms} ms ` +
+    "(network and JSON excluded). The page always runs the solver too, so it updates at solver speed.";
   $("cards").innerHTML = cards.join("");
 
   const th = +$("th").value, nt = r.t.findIndex((v) => v >= th) + 1 || r.t.length;
@@ -167,7 +184,7 @@ function drawProfile() {
   $("ts-out").textContent = `t = ${r.t[k]} s`;
   const tr = [
     { x: r.x, y: r.solver.u[k], name: "accurate solver", line: { color: css("--c-sol"), width: 3 } },
-    { x: r.x, y: r.surrogate.u[k], name: "surrogate (" + r.model + ")", line: { color: css("--c-sur"), dash: "dash", width: 2 } },
+    { x: r.x, y: r.surrogate.u[k], name: (r.model === "interp" ? "model: " : "surrogate: ") + r.model, line: { color: css("--c-sur"), dash: "dash", width: 2 } },
   ];
   if (r.dataset_style) tr.splice(1, 0, { x: r.x, y: r.dataset_style.u[k], name: "dataset-style (PDEBench RK45)",
     line: { color: css("--c-ds"), dash: "dot", width: 2 } });
@@ -211,6 +228,47 @@ function oodTable() {
     `</table><div class="range-note">${(S.meta.evaluation || {}).ood_note || ""}</div>`;
 }
 
+function guideTable() {
+  const ev = S.meta.evaluation || {}, g = ev.model_guide;
+  $("guide").innerHTML = ev.model_guide_html || "";
+  if (!g) return;
+  const ir = g.in_range;
+  $("guide-table").innerHTML = `<table><tr><th>input</th><th class="num">FNO ensemble</th><th class="num">interpolation</th>
+    <th class="num">CNN</th><th>reference</th></tr>
+    <tr><td>in range (held-out test)</td><td class="num">${pct(ir.ensemble_vs_data)}</td>
+      <td class="num">${pct(ir.interp_full_vs_data)} (${pct(ir.interp_app_table_vs_data)} with ${ir.app_table_levels} levels)</td>
+      <td class="num">${pct(ir.cnn_vs_data)}</td><td>dataset</td></tr>` +
+    g.ood_rows.map((r) => `<tr><td>OOD: ${r.family}</td><td class="num">${pct(r.ensemble)}</td><td class="num">${pct(r.interp)}</td>
+      <td class="num">${pct(r.cnn)}</td><td>accurate solver</td></tr>`).join("") +
+    `</table><div class="range-note">Mean relative L2 from results/eval_metrics.json. OOD rows include the ~1.4% dataset-vs-solver floor
+     (see const_in, an in-range control).</div>`;
+}
+
+function pivot(rows, unit) {
+  const methods = [...new Set(rows.map((r) => r.method))], batches = [...new Set(rows.map((r) => r.batch))].sort((a, b) => a - b);
+  return `<table><tr><th>method</th>${batches.map((b) => `<th class="num">batch ${b}</th>`).join("")}</tr>` +
+    methods.map((m) => `<tr><td>${m}</td>${batches.map((b) => { const r = rows.find((x) => x.method === m && x.batch === b);
+      return `<td class="num">${r ? (r.ms_per_sample < 0.1 ? r.ms_per_sample.toFixed(4) : r.ms_per_sample.toFixed(2)) : "–"}</td>`; }).join("")}</tr>`).join("") +
+    `</table><div class="range-note">${unit}</div>`;
+}
+
+function benchTable() {
+  const bb = (S.meta.evaluation || {}).batch_benchmark;
+  if (!bb) return;
+  $("bench-table").innerHTML = pivot(bb.rows, `ms per sample. Measured ${bb.measured} on the development laptop (${bb.threads} CPU threads); ` +
+    "the solver runs one sample at a time, so its cost does not fall with batch size.");
+}
+
+async function runBench() {
+  $("run-bench").textContent = "running…";
+  try {
+    const r = await api("/api/benchmark", {});
+    S.lastBench = r;
+    $("bench-live").innerHTML = pivot(r.rows, `ms per sample, measured just now on this server (${r.torch_threads} threads).`);
+  } catch (e) { banner("bad", "Benchmark failed: " + e.message); }
+  $("run-bench").textContent = "Run live benchmark on this server";
+}
+
 async function runSweep() {
   $("sweep-panel").classList.remove("hidden");
   $("run-sweep").textContent = "running…";
@@ -236,7 +294,7 @@ async function init() {
     const [h, meta] = await Promise.all([api("/api/health"), api("/api/meta")]);
     S.meta = meta;
     $("health").textContent = `ready · ${h.ensemble_members}-member ensemble`;
-    $("footer").innerHTML = (meta.evaluation || {}).footer_html || "";
+    $("footer").innerHTML = ((meta.evaluation || {}).footer_html || "") + " " + ((meta.evaluation || {}).padding_note || "");
   } catch (e) { $("health").textContent = "API unavailable"; banner("bad", "Cannot reach the API: " + e.message); return; }
 
   bindRange("c", "c-out", (v) => {
@@ -271,7 +329,10 @@ async function init() {
     for (const k of Object.keys(S.meta.param_ranges)) { const el = $("ph-" + k); el.value = el.dataset.default; el.dispatchEvent(new Event("input")); }
   });
   $("run-sweep").addEventListener("click", runSweep);
+  $("run-bench").addEventListener("click", runBench);
   oodTable();
+  guideTable();
+  benchTable();
   run();
 }
 init();

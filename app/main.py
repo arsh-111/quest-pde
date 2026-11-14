@@ -9,6 +9,7 @@ from typing import Literal
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
@@ -16,7 +17,8 @@ from pydantic import BaseModel, Field, field_validator
 from app.service import (C_RANGE, PARAM_RANGES, ROOT, SOLVER_DT, T, arr, get_service, outputs, rel_l2)
 from qpde.solver import DEFAULT, PhysParams
 
-app = FastAPI(title="PDE solutions as a service: 1D diffusion-sorption", version="0.1")
+app = FastAPI(title="PDE solutions as a service: 1D diffusion-sorption", version="0.2")
+app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=5)
 STATIC = ROOT / "app" / "static"
 
 
@@ -60,7 +62,7 @@ class Params(BaseModel):
 class Req(BaseModel):
     ic: IC = IC(kind="constant", level=0.1)
     params: Params = Params()
-    model: Literal["ensemble", "fno", "cnn"] = "ensemble"
+    model: Literal["ensemble", "fno", "cnn", "interp"] = "ensemble"
     nx: Literal[256, 1024] = 256
     x_query: float = Field(0.25, ge=0.0, le=1.0)
 
@@ -92,7 +94,8 @@ def meta():
         "dataset_table_c_range": [float(s.table_c[0]), float(s.table_c[-1])],
         "params_default": DEFAULT.to_dict(), "param_ranges": PARAM_RANGES, "solver_dt": SOLVER_DT,
         "models": {"ensemble": f"5 x FNO ({s.ens_prefix}), mean and spread", "fno": f"single FNO ({s.ens_prefix}_s0)",
-                   "cnn": "CNN/U-Net baseline (cnn_s0)"},
+                   "cnn": "CNN/U-Net baseline (cnn_s0)",
+                   "interp": f"interpolation in c between {len(s.table_c)} stored PDEBench trajectories (no learning)"},
         "evaluation": s.summary,
     }
 
@@ -131,6 +134,7 @@ def compare(req: Req):
     p = req.params.phys()
     t0 = time.perf_counter()
     sur = s.predict(u0, req.model, req.nx)
+    itp = sur if req.model == "interp" else s.interp(u0, req.nx)
     sol = s.solve(u0, p, req.nx)
     ood = s.ood_check(u0, p)
     ds = None
@@ -153,6 +157,9 @@ def compare(req: Req):
                                 "how": "interpolation in c between stored PDEBench trajectories (RK45, default tolerance)"}
         res["metrics"]["rel_l2_surrogate_vs_dataset_style"] = rel_l2(sur["u"], ds["u"])
         res["metrics"]["rel_l2_dataset_style_vs_solver"] = rel_l2(ds["u"], sol["u"])
+    res["component_ms"] = {"surrogate": round(sur["ms"], 2), "interp": round(itp["ms"], 3), "solver": round(sol["ms"], 1)}
+    if req.model == "interp" and sur.get("clamped"):
+        res["ood"]["reasons"].append("interpolation clamps: level outside the stored table, output is the nearest edge")
     res["total_ms"] = round((time.perf_counter() - t0) * 1e3, 1)
     return res
 
@@ -173,6 +180,35 @@ def physics_sweep(req: SweepReq):
         rows.append({"value": float(v), "rel_l2_surrogate_vs_solver": rel_l2(sur["u"], sol["u"]),
                      "is_default": bool(abs(v - default) < 1e-12 * max(1, abs(default)))})
     return {"param": req.param, "default": default, "level": req.level, "rows": rows}
+
+
+@app.post("/api/benchmark")
+def benchmark():
+    """Small live benchmark on THIS server (CPU): per-sample time vs batch size. Takes ~2-3 s."""
+    import torch
+    from qpde.train import make_inputs
+    s = get_service()
+    from app.service import x_grid
+    x = x_grid(256)
+    rng = np.random.default_rng(0)
+    rows = []
+    for bs in (1, 32):
+        u0 = rng.uniform(0, 0.2, bs)[:, None] * np.ones((1, 256))
+        X = make_inputs(u0, x)
+        with torch.no_grad():
+            for name, fn in [("fno", lambda: s.fno(X)), ("ensemble", lambda: [m(X) for m in s.ensemble]),
+                             ("cnn", lambda: s.cnn(X))]:
+                fn()
+                t0 = time.perf_counter(); fn(); dt = time.perf_counter() - t0
+                rows.append({"method": name, "batch": bs, "ms_per_sample": round(dt * 1e3 / bs, 3)})
+        t0 = time.perf_counter()
+        for c in u0[:, 0]:
+            s._table_interp(float(c))
+        rows.append({"method": "interp", "batch": bs, "ms_per_sample": round((time.perf_counter() - t0) * 1e3 / bs, 4)})
+    t0 = time.perf_counter()
+    s.solve(np.full(1024, 0.1), DEFAULT, 256)
+    rows.append({"method": "solver (1024 cells, dt=1)", "batch": 1, "ms_per_sample": round((time.perf_counter() - t0) * 1e3, 1)})
+    return {"rows": rows, "torch_threads": torch.get_num_threads(), "note": "live measurement on the serving machine"}
 
 
 @app.get("/")
